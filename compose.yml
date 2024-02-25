@@ -1,6 +1,9 @@
 services:
   app:
-    image: gcc:13.2.0-bookworm
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: result/latest
     entrypoint: /bin/bash
     working_dir: /usr/app
     volumes:

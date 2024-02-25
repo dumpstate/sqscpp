@@ -1,0 +1,7 @@
+services:
+  app:
+    image: gcc:13.2.0-bookworm
+    entrypoint: /bin/bash
+    working_dir: /usr/app
+    volumes:
+      - ./:/usr/app

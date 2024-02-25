@@ -2,8 +2,8 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: result/latest
+      dockerfile: dev.Dockerfile
+    image: sqscpp-dev
     entrypoint: /bin/bash
     working_dir: /usr/app
     volumes:

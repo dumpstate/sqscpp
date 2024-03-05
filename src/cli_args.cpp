@@ -1,6 +1,9 @@
 #include <iostream>
 #include "boost/program_options.hpp"
 
+constexpr int DEFAULT_PORT = 8080;
+constexpr std::string DEFAULT_HOST = "0.0.0.0";
+
 namespace po = boost::program_options;
 
 namespace sqscpp {
@@ -24,12 +27,12 @@ namespace sqscpp {
             return std::pair<bool, CliArgs>(false, CliArgs());
         }
 
-        int target_port = 8080;
+        int target_port = DEFAULT_PORT;
         if (vm.count("port")) {
             target_port = vm["port"].as<int>();
         }
 
-        std::string host = "0.0.0.0";
+        std::string host = DEFAULT_HOST;
         if (vm.count("host")) {
             host = vm["host"].as<std::string>();
         }

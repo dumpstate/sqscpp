@@ -8,3 +8,5 @@ RUN apt update && \
     git clone https://github.com/microsoft/vcpkg /opt/vcpkg && \
     /opt/vcpkg/bootstrap-vcpkg.sh && \
     /opt/vcpkg/vcpkg install restinio
+
+RUN /opt/vcpkg/vcpkg install boost-program-options

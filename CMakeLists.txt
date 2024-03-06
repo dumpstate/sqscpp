@@ -16,13 +16,15 @@ FetchContent_MakeAvailable(googletest)
 find_package(restinio REQUIRED)
 find_package(Boost 1.84.0 COMPONENTS program_options)
 
-add_executable(sqscpp src/main.cpp)
+set(SOURCES src/cli_args.hpp src/cli_args.cpp)
+add_executable(sqscpp src/main.cpp ${SOURCES})
+target_include_directories(sqscpp PRIVATE src)
 target_link_libraries(sqscpp PRIVATE restinio::restinio)
 target_link_libraries(sqscpp PRIVATE Boost::program_options)
 
 # registering unit tests
 enable_testing()
-add_executable(sqscpp_test src/cli_args_test.cpp)
+add_executable(sqscpp_test src/cli_args_test.cpp ${SOURCES})
 target_link_libraries(sqscpp_test GTest::gtest_main)
 target_link_libraries(sqscpp_test Boost::program_options)
 

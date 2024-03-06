@@ -1,17 +1,10 @@
 #include <iostream>
 #include "boost/program_options.hpp"
-
-constexpr int DEFAULT_PORT = 8080;
-constexpr std::string DEFAULT_HOST = "0.0.0.0";
+#include "cli_args.hpp"
 
 namespace po = boost::program_options;
 
 namespace sqscpp {
-    struct CliArgs {
-        int port;
-        std::string host;
-    };
-
     std::pair<bool, CliArgs> parse_cli_args(int argc, char* argv[]) {
         po::options_description desc("Allowed options");
         desc.add_options()

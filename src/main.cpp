@@ -1,6 +1,6 @@
 #include <iostream>
 #include <restinio/core.hpp>
-#include "./cli_args.cpp"
+#include "cli_args.hpp"
 
 auto main(int argc, char* argv[]) -> int {
     auto args_res = sqscpp::parse_cli_args(argc, argv);

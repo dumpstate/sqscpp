@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "./cli_args.cpp"
+#include "cli_args.hpp"
 
 using namespace sqscpp;
 

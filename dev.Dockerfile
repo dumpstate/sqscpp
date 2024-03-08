@@ -10,3 +10,5 @@ RUN apt update && \
     /opt/vcpkg/vcpkg install restinio
 
 RUN /opt/vcpkg/vcpkg install boost-program-options
+
+RUN apt update && apt install -y clang-format && rm -rf /var/lib/apt/lists/*

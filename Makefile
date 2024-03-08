@@ -12,3 +12,6 @@ run_build:
 
 run_test: run_build
 	cd target && ctest && cd ..
+
+run_fmt:
+	find src -regex '.*\.\(cpp\|hpp\)' | xargs clang-format -style=Google -i

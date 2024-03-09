@@ -6,17 +6,13 @@ restinio::request_handling_status_t handler(restinio::request_handle_t req) {
   auto protocol = extract_protocol(&headers);
 
   if (protocol == AWSJsonProtocol1_0) {
-    return json_handler(&headers, req);
+    return aws_json_handler(&headers, req);
   }
 
-  req->create_response()
-      .set_body("AAA(protocol: " + to_str(protocol) + ")")
-      .done();
-
-  return restinio::request_accepted();
+  return aws_query_handler(&headers, req);
 }
 
-restinio::request_handling_status_t json_handler(
+restinio::request_handling_status_t aws_json_handler(
     restinio::http_request_header_t* headers, restinio::request_handle_t req) {
   auto trace_id = extract_trace_id(headers).value_or("");
   auto action = extract_action(headers);
@@ -25,9 +21,15 @@ restinio::request_handling_status_t json_handler(
     return restinio::request_rejected();
   }
 
-  req->create_response().set_body("JSON_HANDLER\n").done();
+  switch (action.value()) {
+    default:
+      return restinio::request_rejected();
+  }
+}
 
-  return restinio::request_accepted();
+restinio::request_handling_status_t aws_query_handler(
+    restinio::http_request_header_t* headers, restinio::request_handle_t req) {
+  return restinio::request_rejected();
 }
 
 AWSProtocol extract_protocol(restinio::http_request_header_t* headers) {

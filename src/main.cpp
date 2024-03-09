@@ -16,13 +16,12 @@ auto main(int argc, char *argv[]) -> int {
   try {
     using traits_t =
         restinio::traits_t<restinio::asio_timer_manager_t,
-                           restinio::single_threaded_ostream_logger_t,
-                           sqscpp::router_t>;
+                           restinio::single_threaded_ostream_logger_t>;
 
     restinio::run(restinio::on_this_thread<traits_t>()
                       .port(args.port)
                       .address(args.host)
-                      .request_handler(sqscpp::create_router()));
+                      .request_handler(sqscpp::handler));
   } catch (const std::exception &ex) {
     std::cerr << "ERR: " << ex.what() << std::endl;
     return EXIT_FAILURE;

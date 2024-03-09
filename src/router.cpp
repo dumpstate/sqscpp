@@ -1,27 +1,29 @@
 #include "router.hpp"
 
 namespace sqscpp {
-std::unique_ptr<router_t> create_router() {
-  auto router = std::make_unique<router_t>();
+    restinio::request_handling_status_t handler(restinio::request_handle_t req) {
+        auto headers = req->header();
+        auto protocol = parse_protocol(&headers);
 
-  router->http_get("/", [](auto req, auto) {
-    req->create_response()
-        .append_header(restinio::http_field::content_type,
-                       "text/plain; charset=utf-8")
-        .set_body("Fooooo")
-        .done();
-    return restinio::request_accepted();
-  });
+        req->create_response()
+            .set_body("AAA(protocol: " + to_str(protocol) + ")")
+            .done();
+        return restinio::request_accepted();
+    }
 
-  router->non_matched_request_handler([](auto req) {
-    return req->create_response(restinio::status_not_found())
-        .append_header(restinio::http_field::content_type,
-                       "text/xml; charset=utf-8")
-        .set_body("<ErrorResponse></ErrorResponse>")
-        .connection_close()
-        .done();
-  });
+    AWSProtocol parse_protocol(restinio::http_request_header_t* headers) {
+        auto content_type = headers->opt_value_of(restinio::http_field::content_type);
+        if (content_type.has_value() && content_type.value() == AWS_JSON_PROTOCOL_1_0) {
+            return AWSJsonProtocol1_0;
+        }
 
-  return router;
+        return AWSQueryProtocol;
+    }
+
+    std::string to_str(AWSProtocol protocol) {
+        switch (protocol) {
+            case AWSQueryProtocol: return "AWSQueryProtocol";
+            case AWSJsonProtocol1_0: return "AWSJsonProtocol1.0";
+        }
+    }
 }
-}  // namespace sqscpp

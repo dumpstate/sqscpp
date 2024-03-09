@@ -3,6 +3,8 @@
 
 #include <restinio/core.hpp>
 
+#include "protocol.hpp"
+
 namespace sqscpp {
 enum AWSProtocol { AWSQueryProtocol, AWSJsonProtocol1_0 };
 enum SQSAction {
@@ -65,6 +67,9 @@ std::optional<SQSAction> extract_action(
 std::optional<std::string> extract_trace_id(
     restinio::http_request_header_t* headers);
 std::string to_str(AWSProtocol protocol);
+
+restinio::request_handling_status_t resp_err(restinio::request_handle_t req,
+                                             Error err);
 }  // namespace sqscpp
 
 #endif  // SQSCPP_ROUTER_H

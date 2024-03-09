@@ -1,8 +1,6 @@
 #include "router.hpp"
 
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
+#include "protocol.hpp"
 
 namespace sqscpp {
 restinio::request_handling_status_t handler(restinio::request_handle_t req) {
@@ -22,17 +20,19 @@ restinio::request_handling_status_t aws_json_handler(
   auto action = extract_action(headers);
 
   if (!action.has_value()) {
-    json res_body;
-    res_body["Message"] = AWS_TARGET + " header not found";
-    return req->create_response(restinio::status_bad_request())
-        .set_body(res_body.dump())
-        .done();
+    return resp_err(req, BadRequestError(AWS_TARGET + " header not found"));
   }
 
   switch (action.value()) {
     default:
-      return restinio::request_rejected();
+      return resp_err(req, Error(restinio::status_not_implemented(),
+                                 "action not implemented"));
   }
+}
+
+restinio::request_handling_status_t resp_err(restinio::request_handle_t req,
+                                             Error err) {
+  return req->create_response(err.status).set_body(to_json(&err)).done();
 }
 
 restinio::request_handling_status_t aws_query_handler(

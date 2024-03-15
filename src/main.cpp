@@ -9,7 +9,7 @@ auto main(int argc, char *argv[]) -> int {
   if (!args_res.first) return EXIT_FAILURE;
   auto args = args_res.second;
 
-  std::cout << "Starting sqscpp " << args.host << ":" << args.port << "\n";
+  std::cout << "Starting sqscpp " << args.host << ":" << args.port << std::endl;
 
   using namespace std::chrono;
 

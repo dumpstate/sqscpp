@@ -4,7 +4,7 @@
 #include <string>
 
 namespace sqscpp {
-const int DEFAULT_PORT = 8080;
+const int DEFAULT_PORT = 9324;
 const std::string DEFAULT_HOST = "0.0.0.0";
 
 struct CliArgs {

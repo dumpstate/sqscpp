@@ -22,11 +22,7 @@ class CreateQueueInput {
   std::map<std::string, std::string> attributes;
 
  public:
-  CreateQueueInput(std::string qname,
-                   std::map<std::string, std::string> attrs) {
-    queue_name = qname;
-    attributes = attrs;
-  }
+  CreateQueueInput(std::string qname, std::map<std::string, std::string> attrs);
 
   std::string get_queue_name() { return queue_name; }
   std::map<std::string, std::string>* get_attrs() { return &attributes; }

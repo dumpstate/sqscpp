@@ -18,10 +18,12 @@ auto main(int argc, char *argv[]) -> int {
         restinio::traits_t<restinio::asio_timer_manager_t,
                            restinio::single_threaded_ostream_logger_t>;
 
+    auto sqs = sqscpp::SQS();
+
     restinio::run(restinio::on_this_thread<traits_t>()
                       .port(args.port)
                       .address(args.host)
-                      .request_handler(sqscpp::handler));
+                      .request_handler(sqscpp::handler_factory(&sqs)));
   } catch (const std::exception &ex) {
     std::cerr << "ERR: " << ex.what() << std::endl;
     return EXIT_FAILURE;

@@ -3,19 +3,23 @@
 #include "protocol.hpp"
 
 namespace sqscpp {
-restinio::request_handling_status_t handler(restinio::request_handle_t req) {
-  auto headers = req->header();
-  auto protocol = extract_protocol(&headers);
+std::function<restinio::request_handling_status_t(restinio::request_handle_t)>
+handler_factory(SQS* sqs) {
+  return [sqs](restinio::request_handle_t req) {
+    auto headers = req->header();
+    auto protocol = extract_protocol(&headers);
 
-  if (protocol == AWSJsonProtocol1_0) {
-    return aws_json_handler(&headers, req);
-  }
+    if (protocol == AWSJsonProtocol1_0) {
+      return aws_json_handler(sqs, &headers, req);
+    }
 
-  return aws_query_handler(&headers, req);
+    return aws_query_handler(sqs, &headers, req);
+  };
 }
 
 restinio::request_handling_status_t aws_json_handler(
-    restinio::http_request_header_t* headers, restinio::request_handle_t req) {
+    SQS* sqs, restinio::http_request_header_t* headers,
+    restinio::request_handle_t req) {
   auto trace_id = extract_trace_id(headers).value_or("");
   auto action = extract_action(headers);
 
@@ -26,19 +30,18 @@ restinio::request_handling_status_t aws_json_handler(
   switch (action.value()) {
     case SQSCreateQueue: {
       auto body = CreateQueueInput::from_str(req->body());
-      if (!body.has_value())
-        return resp_err(req, BadRequestError("invalid request body"));
-      std::cout << "queue name: " << body.value().get_queue_name() << std::endl;
-      for (const auto& pair : *body.value().get_attrs()) {
-        std::cout << pair.first << " : " << pair.second << std::endl;
-      }
-      return resp_err(
-          req, Error(restinio::status_not_implemented(), "not implemented"));
+      sqs->create_queue(&body.value());
+      return resp_ok(req, "");
     }
     default:
       return resp_err(req, Error(restinio::status_not_implemented(),
                                  "action not implemented"));
   }
+}
+
+restinio::request_handling_status_t resp_ok(restinio::request_handle_t req,
+                                            std::string body) {
+  return req->create_response().set_body(std::move(body)).done();
 }
 
 restinio::request_handling_status_t resp_err(restinio::request_handle_t req,
@@ -47,7 +50,8 @@ restinio::request_handling_status_t resp_err(restinio::request_handle_t req,
 }
 
 restinio::request_handling_status_t aws_query_handler(
-    restinio::http_request_header_t* headers, restinio::request_handle_t req) {
+    SQS* sqs, restinio::http_request_header_t* headers,
+    restinio::request_handle_t req) {
   return restinio::request_rejected();
 }
 

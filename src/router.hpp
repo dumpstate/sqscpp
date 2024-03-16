@@ -4,6 +4,7 @@
 #include <restinio/core.hpp>
 
 #include "protocol.hpp"
+#include "sqs.hpp"
 
 namespace sqscpp {
 enum AWSProtocol { AWSQueryProtocol, AWSJsonProtocol1_0 };
@@ -55,11 +56,14 @@ const std::map<std::string, SQSAction> AWS_SQS_ACTIONS = {
     {"AmazonSQS.TagQueue", SQSTagQueue},
     {"AmazonSQS.UntagQueue", SQSUntagQueue}};
 
-restinio::request_handling_status_t handler(restinio::request_handle_t req);
+std::function<restinio::request_handling_status_t(restinio::request_handle_t)>
+handler_factory(SQS* sqs);
 restinio::request_handling_status_t aws_json_handler(
-    restinio::http_request_header_t* headers, restinio::request_handle_t req);
+    SQS* sqs, restinio::http_request_header_t* headers,
+    restinio::request_handle_t req);
 restinio::request_handling_status_t aws_query_handler(
-    restinio::http_request_header_t* headers, restinio::request_handle_t req);
+    SQS* sqs, restinio::http_request_header_t* headers,
+    restinio::request_handle_t req);
 
 AWSProtocol extract_protocol(restinio::http_request_header_t* headers);
 std::optional<SQSAction> extract_action(
@@ -68,6 +72,8 @@ std::optional<std::string> extract_trace_id(
     restinio::http_request_header_t* headers);
 std::string to_str(AWSProtocol protocol);
 
+restinio::request_handling_status_t resp_ok(restinio::request_handle_t req,
+                                            std::string body);
 restinio::request_handling_status_t resp_err(restinio::request_handle_t req,
                                              Error err);
 }  // namespace sqscpp

@@ -32,6 +32,12 @@ std::optional<std::string> parse_non_empty_string(json j) {
   }
 }
 
+CreateQueueInput::CreateQueueInput(std::string qname,
+                                   std::map<std::string, std::string> attrs) {
+  queue_name = qname;
+  attributes = attrs;
+}
+
 std::optional<CreateQueueInput> CreateQueueInput::from_str(std::string str) {
   try {
     auto j = json::parse(str);

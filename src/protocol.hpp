@@ -8,6 +8,9 @@
 using json = nlohmann::json;
 
 namespace sqscpp {
+std::optional<std::map<std::string, std::string>> parse_dict(json j);
+std::optional<std::string> parse_non_empty_string(json j);
+
 struct Error {
   restinio::http_status_line_t status;
   std::string message;
@@ -16,19 +19,19 @@ struct Error {
 class CreateQueueInput {
  private:
   std::string queue_name;
+  std::map<std::string, std::string> attributes;
 
  public:
-  CreateQueueInput(std::string qname) { queue_name = qname; }
+  CreateQueueInput(std::string qname,
+                   std::map<std::string, std::string> attrs) {
+    queue_name = qname;
+    attributes = attrs;
+  }
 
   std::string get_queue_name() { return queue_name; }
+  std::map<std::string, std::string>* get_attrs() { return &attributes; }
 
-  static std::optional<CreateQueueInput> from_str(std::string str) {
-    if (str.empty()) return {};
-    auto j = json::parse(str);
-    auto queue_name = j["QueueName"];
-    if (!queue_name.is_string() || queue_name.empty()) return {};
-    return CreateQueueInput(queue_name);
-  }
+  static std::optional<CreateQueueInput> from_str(std::string str);
 };
 
 struct BadRequestError : Error {

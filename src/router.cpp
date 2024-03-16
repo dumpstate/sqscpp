@@ -29,6 +29,9 @@ restinio::request_handling_status_t aws_json_handler(
       if (!body.has_value())
         return resp_err(req, BadRequestError("invalid request body"));
       std::cout << "queue name: " << body.value().get_queue_name() << std::endl;
+      for (const auto& pair : *body.value().get_attrs()) {
+        std::cout << pair.first << " : " << pair.second << std::endl;
+      }
       return resp_err(
           req, Error(restinio::status_not_implemented(), "not implemented"));
     }

@@ -26,9 +26,10 @@ target_link_libraries(sqscpp PRIVATE nlohmann_json::nlohmann_json)
 
 # registering unit tests
 enable_testing()
-add_executable(sqscpp_test src/cli_args_test.cpp src/cli_args.hpp src/cli_args.cpp)
+add_executable(sqscpp_test src/protocol_test.cpp src/cli_args_test.cpp src/cli_args.hpp src/cli_args.cpp src/protocol.hpp src/protocol.cpp)
 target_link_libraries(sqscpp_test GTest::gtest_main)
 target_link_libraries(sqscpp_test Boost::program_options)
+target_link_libraries(sqscpp PRIVATE nlohmann_json::nlohmann_json)
 
 include(GoogleTest)
 gtest_discover_tests(sqscpp_test)

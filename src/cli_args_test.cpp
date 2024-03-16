@@ -33,7 +33,7 @@ TEST(cli_args_test, parse_cli_args_parse_host) {
 
   EXPECT_EQ(res.first, true);
   EXPECT_EQ(res.second.host, "localhost");
-  EXPECT_EQ(res.second.port, 8080);
+  EXPECT_EQ(res.second.port, DEFAULT_PORT);
 }
 
 TEST(cli_args_test, parse_cli_args_parse_host_and_port) {

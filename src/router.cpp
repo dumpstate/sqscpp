@@ -30,8 +30,12 @@ restinio::request_handling_status_t aws_json_handler(
   switch (action.value()) {
     case SQSCreateQueue: {
       auto body = CreateQueueInput::from_str(req->body());
-      sqs->create_queue(&body.value());
-      return resp_ok(req, "");
+      if (!body.has_value()) {
+        return resp_err(req, BadRequestError("invalid request body"));
+      }
+      auto qurl = sqs->create_queue(&body.value());
+      auto res = CreateQueueResponse{qurl};
+      return resp_ok(req, to_json(&res));
     }
     default:
       return resp_err(req, Error(restinio::status_not_implemented(),

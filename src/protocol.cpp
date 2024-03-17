@@ -12,6 +12,12 @@ std::string to_json(Error* err) {
   return j.dump();
 }
 
+std::string to_json(CreateQueueResponse* res) {
+  json j;
+  j["QueueUrl"] = res->queue_url;
+  return j.dump();
+}
+
 std::optional<std::map<std::string, std::string>> parse_dict(json j) {
   if (!j.is_object()) return {};
   try {
@@ -32,10 +38,13 @@ std::optional<std::string> parse_non_empty_string(json j) {
   }
 }
 
-CreateQueueInput::CreateQueueInput(std::string qname,
-                                   std::map<std::string, std::string> attrs) {
+CreateQueueInput::CreateQueueInput(
+    std::string qname,
+    std::optional<std::map<std::string, std::string>> attrs) {
   queue_name = qname;
-  attributes = attrs;
+  if (attrs.has_value()) {
+    attributes = attrs.value();
+  }
 }
 
 std::optional<CreateQueueInput> CreateQueueInput::from_str(std::string str) {
@@ -46,9 +55,8 @@ std::optional<CreateQueueInput> CreateQueueInput::from_str(std::string str) {
     if (!queue_name.has_value()) return {};
 
     auto attrs = parse_dict(j["Attributes"]);
-    if (!attrs.has_value()) return {};
 
-    return CreateQueueInput(queue_name.value(), attrs.value());
+    return CreateQueueInput(queue_name.value(), attrs);
   } catch (json::parse_error& e) {
     return {};
   }

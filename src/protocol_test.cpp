@@ -51,6 +51,14 @@ TEST(protocol_test, create_queue_input_from_str) {
   EXPECT_EQ(res.value().get_attrs()->at("DelaySeconds"), "5");
 }
 
+TEST(protocol_test, create_queue_input_from_str_no_attrs) {
+  auto res = CreateQueueInput::from_str("{\"QueueName\":\"test-queue\"}");
+
+  EXPECT_EQ(res.has_value(), true);
+  EXPECT_EQ(res.value().get_queue_name(), "test-queue");
+  EXPECT_EQ(res.value().get_attrs()->size(), 0);
+}
+
 TEST(protocol_test, create_queue_input_from_str_empty) {
   auto res = CreateQueueInput::from_str("{}");
 
@@ -62,4 +70,12 @@ TEST(protocol_test, create_queue_input_from_str_no_queue_name) {
       CreateQueueInput::from_str("{\"Attributes\":{\"DelaySeconds\":\"5\"}}");
 
   EXPECT_EQ(res.has_value(), false);
+}
+
+TEST(protocol_test, create_queue_response_to_str) {
+  auto res = new CreateQueueResponse();
+  res->queue_url = "http://localhost:9999/test-queue";
+  auto str = to_json(res);
+
+  EXPECT_EQ(str, "{\"QueueUrl\":\"http://localhost:9999/test-queue\"}");
 }

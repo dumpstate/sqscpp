@@ -1,15 +1,23 @@
 #include "sqs.hpp"
 
 namespace sqscpp {
-SQS::SQS() {
+SQS::SQS(std::string ep) {
+  endpoint = ep;
   queues = std::map<std::string, std::vector<std::string>>();
   queue_attrs = std::map<std::string, std::map<std::string, std::string>>();
 }
 
-void SQS::create_queue(CreateQueueInput* input) {
-  std::string qname = input->get_queue_name();
+std::string SQS::create_queue(CreateQueueInput* input) {
+  std::string qurl = get_queue_url(input->get_queue_name());
   std::map<std::string, std::string>* attrs = input->get_attrs();
-  queues[qname] = std::vector<std::string>();
-  queue_attrs[qname] = *attrs;
+  queues[qurl] = std::vector<std::string>();
+  queue_attrs[qurl] = *attrs;
+  return qurl;
+}
+
+std::string SQS::get_queue_url(std::string qname) {
+  std::stringstream ss;
+  ss << endpoint << "/" << qname;
+  return ss.str();
 }
 }  // namespace sqscpp

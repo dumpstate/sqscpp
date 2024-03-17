@@ -22,7 +22,8 @@ class CreateQueueInput {
   std::map<std::string, std::string> attributes;
 
  public:
-  CreateQueueInput(std::string qname, std::map<std::string, std::string> attrs);
+  CreateQueueInput(std::string qname,
+                   std::optional<std::map<std::string, std::string>> attrs);
 
   std::string get_queue_name() { return queue_name; }
   std::map<std::string, std::string>* get_attrs() { return &attributes; }
@@ -37,7 +38,12 @@ struct BadRequestError : Error {
   }
 };
 
+struct CreateQueueResponse {
+  std::string queue_url;
+};
+
 std::string to_json(Error* err);
+std::string to_json(CreateQueueResponse* res);
 }  // namespace sqscpp
 
 #endif  // SQSCPP_PROTOCOL_H

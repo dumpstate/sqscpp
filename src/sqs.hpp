@@ -10,12 +10,15 @@
 namespace sqscpp {
 class SQS {
  private:
+  std::string endpoint;
   std::map<std::string, std::vector<std::string>> queues;
   std::map<std::string, std::map<std::string, std::string>> queue_attrs;
 
+  std::string get_queue_url(std::string qname);
+
  public:
-  SQS();
-  void create_queue(CreateQueueInput* input);
+  SQS(std::string ep);
+  std::string create_queue(CreateQueueInput* input);
 };
 }  // namespace sqscpp
 

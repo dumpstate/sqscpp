@@ -18,7 +18,7 @@ auto main(int argc, char *argv[]) -> int {
         restinio::traits_t<restinio::asio_timer_manager_t,
                            restinio::single_threaded_ostream_logger_t>;
 
-    auto sqs = sqscpp::SQS();
+    auto sqs = sqscpp::SQS(endpoint_url(&args));
 
     restinio::run(restinio::on_this_thread<traits_t>()
                       .port(args.port)

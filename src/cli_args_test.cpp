@@ -6,7 +6,10 @@ using namespace sqscpp;
 
 std::vector<char *> as_argv(std::vector<std::string> args) {
   std::vector<char *> argv;
-  for (const auto &arg : args) argv.push_back((char *)arg.data());
+  for (const auto &arg : args) {
+    std::cout << "pushing onto vector: " << arg.data() << std::endl;
+    argv.push_back((char *)arg.data());
+  }
   argv.push_back(nullptr);
   return argv;
 }
@@ -49,19 +52,16 @@ TEST(cli_args_test, parse_cli_args_parse_host_and_port) {
   EXPECT_EQ(res.second.account_number, DEFAULT_ACCOUNT_NUMBER);
 }
 
-// FIXME
-// TEST(cli_args_test, parse_cli_args_parse_host_port_account_number) {
-//   auto account_number = "123456789";
-//   auto argv = as_argv({"sqscpp", "--host", "localhost", "--port", "9999",
-//   "--account_number", account_number}); auto res = parse_cli_args(argv.size()
-//   - 1, argv.data());
+TEST(cli_args_test, parse_cli_args_parse_account_number) {
+  auto acctn = "123456789";
+  auto argv = as_argv({"sqscpp", "--acctn", acctn});
+  auto res = parse_cli_args(argv.size() - 1, argv.data());
 
-//   EXPECT_EQ(res.first, true);
-//   EXPECT_EQ(res.second.host, "localhost");
-//   EXPECT_EQ(res.second.port, 9999);
-//   std::cout << res.second.account_number << std::endl;
-//   EXPECT_EQ(res.second.account_number, account_number);
-// }
+  EXPECT_EQ(res.first, true);
+  EXPECT_EQ(res.second.host, DEFAULT_HOST);
+  EXPECT_EQ(res.second.port, DEFAULT_PORT);
+  EXPECT_EQ(res.second.account_number, acctn);
+}
 
 TEST(cli_args_test, endpoint_url) {
   auto args = CliArgs(9999, "localhost", "123456789012");

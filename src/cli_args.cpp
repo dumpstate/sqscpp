@@ -12,7 +12,7 @@ std::pair<bool, CliArgs> parse_cli_args(int argc, char *argv[]) {
   desc.add_options()("help", "print help message")(
       "host", po::value<std::string>(), "target hostname")(
       "port", po::value<int>(), "target port")(
-      "acctn", po::value<std::string>(), "AWS account number");
+      "account-number", po::value<std::string>(), "AWS account number");
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm);
@@ -33,8 +33,8 @@ std::pair<bool, CliArgs> parse_cli_args(int argc, char *argv[]) {
   }
 
   std::string account_number = DEFAULT_ACCOUNT_NUMBER;
-  if (vm.contains("acctn")) {
-    account_number = vm["acctn"].as<std::string>();
+  if (vm.contains("account-number")) {
+    account_number = vm["account-number"].as<std::string>();
   }
 
   return std::pair<bool, CliArgs>(true,

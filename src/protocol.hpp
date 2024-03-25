@@ -42,8 +42,13 @@ struct CreateQueueResponse {
   std::string queue_url;
 };
 
+struct ListQueuesResponse {
+  std::vector<std::string> queue_urls;
+};
+
 std::string to_json(Error* err);
 std::string to_json(CreateQueueResponse* res);
+std::string to_json(ListQueuesResponse* res);
 }  // namespace sqscpp
 
 #endif  // SQSCPP_PROTOCOL_H

@@ -18,6 +18,12 @@ std::string to_json(CreateQueueResponse* res) {
   return j.dump();
 }
 
+std::string to_json(ListQueuesResponse* res) {
+  json j;
+  j["QueueUrls"] = res->queue_urls;
+  return j.dump();
+}
+
 std::optional<std::map<std::string, std::string>> parse_dict(json j) {
   if (!j.is_object()) return {};
   try {

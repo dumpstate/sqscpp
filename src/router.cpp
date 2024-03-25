@@ -37,6 +37,11 @@ restinio::request_handling_status_t aws_json_handler(
       auto res = CreateQueueResponse{qurl};
       return resp_ok(req, to_json(&res));
     }
+    case SQSListQueues: {
+      auto qurls = sqs->get_queue_urls();
+      auto res = ListQueuesResponse{qurls};
+      return resp_ok(req, to_json(&res));
+    }
     default:
       return resp_err(req, Error(restinio::status_not_implemented(),
                                  "action not implemented"));

@@ -20,4 +20,14 @@ std::string SQS::get_queue_url(std::string qname) {
   ss << endpoint << "/" << qname;
   return ss.str();
 }
+
+std::vector<std::string> SQS::get_queue_urls() {
+  std::vector<std::string> urls;
+
+  for (const auto q : queues) {
+    urls.push_back(q.first);
+  }
+
+  return urls;
+}
 }  // namespace sqscpp

@@ -79,3 +79,12 @@ TEST(protocol_test, create_queue_response_to_str) {
 
   EXPECT_EQ(str, "{\"QueueUrl\":\"http://localhost:9999/test-queue\"}");
 }
+
+TEST(protocol_test, list_queues_response_to_str) {
+  auto res = new ListQueuesResponse();
+  std::vector<std::string> qs = {"foo", "bar"};
+  res->queue_urls = qs;
+  auto str = to_json(res);
+
+  EXPECT_EQ(str, "{\"QueueUrls\":[\"foo\",\"bar\"]}");
+}

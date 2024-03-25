@@ -19,6 +19,7 @@ class SQS {
  public:
   SQS(std::string ep);
   std::string create_queue(CreateQueueInput* input);
+  std::vector<std::string> get_queue_urls();
 };
 }  // namespace sqscpp
 

@@ -67,4 +67,20 @@ std::optional<CreateQueueInput> CreateQueueInput::from_str(std::string str) {
     return {};
   }
 }
+
+DeleteQueueInput::DeleteQueueInput(std::string qurl) {
+  queue_url = qurl;
+}
+
+std::optional<DeleteQueueInput> DeleteQueueInput::from_str(std::string str) {
+  try {
+    auto j = json::parse(str);
+
+    auto qurl = parse_non_empty_string(j["QueueUrl"]);
+    if (!qurl.has_value()) return {};
+    return DeleteQueueInput{qurl.value()};
+  } catch (json::parse_error& e) {
+    return {};
+  }
+}
 }  // namespace sqscpp

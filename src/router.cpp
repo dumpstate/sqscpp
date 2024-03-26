@@ -42,6 +42,14 @@ restinio::request_handling_status_t aws_json_handler(
       auto res = ListQueuesResponse{qurls};
       return resp_ok(req, to_json(&res));
     }
+    case SQSDeleteQueue: {
+      auto body = DeleteQueueInput::from_str(req->body());
+      if (!body.has_value()) {
+        return resp_err(req, BadRequestError("invalid request body"));
+      }
+      sqs->delete_queue(body.value().get_queue_url());
+      return resp_ok(req, "");
+    }
     default:
       return resp_err(req, Error(restinio::status_not_implemented(),
                                  "action not implemented"));

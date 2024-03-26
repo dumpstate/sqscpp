@@ -88,3 +88,10 @@ TEST(protocol_test, list_queues_response_to_str) {
 
   EXPECT_EQ(str, "{\"QueueUrls\":[\"foo\",\"bar\"]}");
 }
+
+TEST(protocol_test, delete_queue_input_from_str) {
+  auto res = DeleteQueueInput::from_str("{\"QueueUrl\":\"test-url\"}");
+
+  EXPECT_EQ(res.has_value(), true);
+  EXPECT_EQ(res.value().get_queue_url(), "test-url");
+}

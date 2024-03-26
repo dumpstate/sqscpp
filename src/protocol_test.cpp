@@ -135,3 +135,12 @@ TEST(protocol_test, list_queue_tags_response_to_str) {
 
   EXPECT_EQ(str, "{\"Tags\":{\"key\":\"value\"}}");
 }
+
+TEST(protocol_test, untag_queue_input_from_str) {
+  auto res = UntagQueueInput::from_str(
+      "{\"QueueUrl\":\"test-url\",\"TagKeys\":[\"key\"]}");
+
+  EXPECT_EQ(res.has_value(), true);
+  EXPECT_EQ(res.value().get_queue_url(), "test-url");
+  EXPECT_EQ(res.value().get_tag_keys().at(0), "key");
+}

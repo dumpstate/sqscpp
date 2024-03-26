@@ -26,6 +26,7 @@ class SQS {
   bool tag_queue(std::string qurl, std::map<std::string, std::string>* tags);
   std::optional<std::map<std::string, std::string>*> get_queue_tags(
       std::string qurl);
+  bool untag_queue(std::string qurl, std::vector<std::string>* tag_keys);
 };
 }  // namespace sqscpp
 

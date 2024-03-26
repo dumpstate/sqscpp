@@ -93,6 +93,19 @@ restinio::request_handling_status_t aws_json_handler(
       auto res = ListQueueTagsResponse{tags.value()};
       return resp_ok(req, to_json(&res));
     }
+    case SQSUntagQueue: {
+      auto body = UntagQueueInput::from_str(req->body());
+      if (!body.has_value()) {
+        return resp_err(req, BadRequestError("invalid request body"));
+      }
+      auto keys = body.value().get_tag_keys();
+      auto ok = sqs->untag_queue(body.value().get_queue_url(), &keys);
+      if (!ok) {
+        return resp_err(req,
+                        BadRequestError("The specified queue does not exist."));
+      }
+      return resp_ok(req, "");
+    }
     default:
       return resp_err(req, Error(restinio::status_not_implemented(),
                                  "action not implemented"));

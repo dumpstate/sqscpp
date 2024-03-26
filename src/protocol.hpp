@@ -9,6 +9,7 @@ using json = nlohmann::json;
 
 namespace sqscpp {
 std::optional<std::map<std::string, std::string>> parse_dict(json j);
+std::optional<std::vector<std::string>> parse_list(json j);
 std::optional<std::string> parse_non_empty_string(json j);
 
 struct Error {
@@ -75,6 +76,19 @@ class ListQueueTagsInput {
   std::string get_queue_url() { return queue_url; }
 
   static std::optional<ListQueueTagsInput> from_str(std::string str);
+};
+
+class UntagQueueInput {
+ private:
+  std::string queue_url;
+  std::vector<std::string> tag_keys;
+
+ public:
+  UntagQueueInput(std::string qurl, std::vector<std::string> keys)
+      : queue_url(qurl), tag_keys(keys) {}
+  std::string get_queue_url() { return queue_url; }
+  std::vector<std::string> get_tag_keys() { return tag_keys; }
+  static std::optional<UntagQueueInput> from_str(std::string str);
 };
 
 struct BadRequestError : Error {

@@ -69,4 +69,17 @@ std::optional<std::map<std::string, std::string>*> SQS::get_queue_tags(
   }
   return &queue_tags[qurl];
 }
+
+bool SQS::untag_queue(std::string qurl, std::vector<std::string>* tag_keys) {
+  if (queues.find(qurl) == queues.end()) {
+    return false;
+  }
+  if (queue_tags.find(qurl) == queue_tags.end()) {
+    return true;
+  }
+  for (const auto& key : *tag_keys) {
+    queue_tags[qurl].erase(key);
+  }
+  return true;
+}
 }  // namespace sqscpp

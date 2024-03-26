@@ -32,14 +32,14 @@ class CreateQueueInput {
 };
 
 class DeleteQueueInput {
-  private:
-    std::string queue_url;
+ private:
+  std::string queue_url;
 
-  public:
-    DeleteQueueInput(std::string qurl);
-    std::string get_queue_url() { return queue_url; }
+ public:
+  DeleteQueueInput(std::string qurl);
+  std::string get_queue_url() { return queue_url; }
 
-    static std::optional<DeleteQueueInput> from_str(std::string str);
+  static std::optional<DeleteQueueInput> from_str(std::string str);
 };
 
 struct BadRequestError : Error {

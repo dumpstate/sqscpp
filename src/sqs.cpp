@@ -31,7 +31,12 @@ std::vector<std::string> SQS::get_queue_urls() {
   return urls;
 }
 
-void SQS::delete_queue(std::string qurl) {
+bool SQS::delete_queue(std::string qurl) {
+  if (queues.find(qurl) == queues.end()) {
+    return false;
+  }
+
   queues.erase(qurl);
+  return true;
 }
 }  // namespace sqscpp

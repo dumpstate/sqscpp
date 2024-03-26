@@ -68,9 +68,7 @@ std::optional<CreateQueueInput> CreateQueueInput::from_str(std::string str) {
   }
 }
 
-DeleteQueueInput::DeleteQueueInput(std::string qurl) {
-  queue_url = qurl;
-}
+DeleteQueueInput::DeleteQueueInput(std::string qurl) { queue_url = qurl; }
 
 std::optional<DeleteQueueInput> DeleteQueueInput::from_str(std::string str) {
   try {

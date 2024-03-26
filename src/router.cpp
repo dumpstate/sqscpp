@@ -47,7 +47,11 @@ restinio::request_handling_status_t aws_json_handler(
       if (!body.has_value()) {
         return resp_err(req, BadRequestError("invalid request body"));
       }
-      sqs->delete_queue(body.value().get_queue_url());
+      auto qurl = body.value().get_queue_url();
+      if (!sqs->delete_queue(qurl)) {
+        return resp_err(req,
+                        BadRequestError("The specified queue does not exist."));
+      }
       return resp_ok(req, "");
     }
     default:

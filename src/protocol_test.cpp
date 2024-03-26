@@ -95,3 +95,18 @@ TEST(protocol_test, delete_queue_input_from_str) {
   EXPECT_EQ(res.has_value(), true);
   EXPECT_EQ(res.value().get_queue_url(), "test-url");
 }
+
+TEST(protocol_test, get_queue_url_from_str) {
+  auto res = GetQueueUrlInput::from_str("{\"QueueName\":\"test-queue\"}");
+
+  EXPECT_EQ(res.has_value(), true);
+  EXPECT_EQ(res.value().get_queue_name(), "test-queue");
+}
+
+TEST(protocol_test, get_queue_url_response_to_str) {
+  auto res = new GetQueueUrlResponse();
+  res->queue_url = "http://localhost:9999/test-queue";
+  auto str = to_json(res);
+
+  EXPECT_EQ(str, "{\"QueueUrl\":\"http://localhost:9999/test-queue\"}");
+}

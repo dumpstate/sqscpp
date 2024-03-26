@@ -31,12 +31,22 @@ class CreateQueueInput {
   static std::optional<CreateQueueInput> from_str(std::string str);
 };
 
+class GetQueueUrlInput {
+ private:
+  std::string queue_name;
+
+ public:
+  GetQueueUrlInput(std::string qname) : queue_name(qname) {}
+  std::string get_queue_name() { return queue_name; }
+  static std::optional<GetQueueUrlInput> from_str(std::string str);
+};
+
 class DeleteQueueInput {
  private:
   std::string queue_url;
 
  public:
-  DeleteQueueInput(std::string qurl);
+  DeleteQueueInput(std::string qurl) : queue_url(qurl){};
   std::string get_queue_url() { return queue_url; }
 
   static std::optional<DeleteQueueInput> from_str(std::string str);
@@ -57,9 +67,14 @@ struct ListQueuesResponse {
   std::vector<std::string> queue_urls;
 };
 
+struct GetQueueUrlResponse {
+  std::string queue_url;
+};
+
 std::string to_json(Error* err);
 std::string to_json(CreateQueueResponse* res);
 std::string to_json(ListQueuesResponse* res);
+std::string to_json(GetQueueUrlResponse* res);
 }  // namespace sqscpp
 
 #endif  // SQSCPP_PROTOCOL_H

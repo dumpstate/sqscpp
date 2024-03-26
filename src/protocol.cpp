@@ -24,6 +24,12 @@ std::string to_json(ListQueuesResponse* res) {
   return j.dump();
 }
 
+std::string to_json(GetQueueUrlResponse* res) {
+  json j;
+  j["QueueUrl"] = res->queue_url;
+  return j.dump();
+}
+
 std::optional<std::map<std::string, std::string>> parse_dict(json j) {
   if (!j.is_object()) return {};
   try {
@@ -68,8 +74,6 @@ std::optional<CreateQueueInput> CreateQueueInput::from_str(std::string str) {
   }
 }
 
-DeleteQueueInput::DeleteQueueInput(std::string qurl) { queue_url = qurl; }
-
 std::optional<DeleteQueueInput> DeleteQueueInput::from_str(std::string str) {
   try {
     auto j = json::parse(str);
@@ -77,6 +81,18 @@ std::optional<DeleteQueueInput> DeleteQueueInput::from_str(std::string str) {
     auto qurl = parse_non_empty_string(j["QueueUrl"]);
     if (!qurl.has_value()) return {};
     return DeleteQueueInput{qurl.value()};
+  } catch (json::parse_error& e) {
+    return {};
+  }
+}
+
+std::optional<GetQueueUrlInput> GetQueueUrlInput::from_str(std::string str) {
+  try {
+    auto j = json::parse(str);
+
+    auto qname = parse_non_empty_string(j["QueueName"]);
+    if (!qname.has_value()) return {};
+    return GetQueueUrlInput{qname.value()};
   } catch (json::parse_error& e) {
     return {};
   }

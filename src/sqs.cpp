@@ -8,14 +8,14 @@ SQS::SQS(std::string ep) {
 }
 
 std::string SQS::create_queue(CreateQueueInput* input) {
-  std::string qurl = get_queue_url(input->get_queue_name());
+  std::string qurl = new_queue_url(input->get_queue_name());
   std::map<std::string, std::string>* attrs = input->get_attrs();
   queues[qurl] = std::vector<std::string>();
   queue_attrs[qurl] = *attrs;
   return qurl;
 }
 
-std::string SQS::get_queue_url(std::string qname) {
+std::string SQS::new_queue_url(std::string qname) {
   std::stringstream ss;
   ss << endpoint << "/" << qname;
   return ss.str();
@@ -29,6 +29,14 @@ std::vector<std::string> SQS::get_queue_urls() {
   }
 
   return urls;
+}
+
+std::optional<std::string> SQS::get_queue_url(std::string qname) {
+  auto qurl = new_queue_url(qname);
+  if (queues.find(qurl) == queues.end()) {
+    return {};
+  }
+  return qurl;
 }
 
 bool SQS::delete_queue(std::string qurl) {

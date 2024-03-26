@@ -54,6 +54,19 @@ restinio::request_handling_status_t aws_json_handler(
       }
       return resp_ok(req, "");
     }
+    case SQSGetQueueUrl: {
+      auto body = GetQueueUrlInput::from_str(req->body());
+      if (!body.has_value()) {
+        return resp_err(req, BadRequestError("invalid request body"));
+      }
+      auto qurl = sqs->get_queue_url(body.value().get_queue_name());
+      if (!qurl.has_value()) {
+        return resp_err(req,
+                        BadRequestError("The specified queue does not exist."));
+      }
+      auto res = GetQueueUrlResponse{qurl.value()};
+      return resp_ok(req, to_json(&res));
+    }
     default:
       return resp_err(req, Error(restinio::status_not_implemented(),
                                  "action not implemented"));

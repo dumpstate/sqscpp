@@ -30,6 +30,12 @@ std::string to_json(GetQueueUrlResponse* res) {
   return j.dump();
 }
 
+std::string to_json(ListQueueTagsResponse* res) {
+  json j;
+  j["Tags"] = *(res->tags);
+  return j.dump();
+}
+
 std::optional<std::map<std::string, std::string>> parse_dict(json j) {
   if (!j.is_object()) return {};
   try {
@@ -93,6 +99,36 @@ std::optional<GetQueueUrlInput> GetQueueUrlInput::from_str(std::string str) {
     auto qname = parse_non_empty_string(j["QueueName"]);
     if (!qname.has_value()) return {};
     return GetQueueUrlInput{qname.value()};
+  } catch (json::parse_error& e) {
+    return {};
+  }
+}
+
+std::optional<TagQueueInput> TagQueueInput::from_str(std::string str) {
+  try {
+    auto j = json::parse(str);
+
+    auto qurl = parse_non_empty_string(j["QueueUrl"]);
+    if (!qurl.has_value()) return {};
+
+    auto tags = parse_dict(j["Tags"]);
+    if (!tags.has_value()) return {};
+
+    return TagQueueInput{qurl.value(), tags.value()};
+  } catch (json::parse_error& e) {
+    return {};
+  }
+}
+
+std::optional<ListQueueTagsInput> ListQueueTagsInput::from_str(
+    std::string str) {
+  try {
+    auto j = json::parse(str);
+
+    auto qurl = parse_non_empty_string(j["QueueUrl"]);
+    if (!qurl.has_value()) return {};
+
+    return ListQueueTagsInput{qurl.value()};
   } catch (json::parse_error& e) {
     return {};
   }

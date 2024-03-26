@@ -67,6 +67,32 @@ restinio::request_handling_status_t aws_json_handler(
       auto res = GetQueueUrlResponse{qurl.value()};
       return resp_ok(req, to_json(&res));
     }
+    case SQSTagQueue: {
+      auto body = TagQueueInput::from_str(req->body());
+      if (!body.has_value()) {
+        return resp_err(req, BadRequestError("invalid request body"));
+      }
+      auto tags = body.value().get_tags();
+      auto ok = sqs->tag_queue(body.value().get_queue_url(), &tags);
+      if (!ok) {
+        return resp_err(req,
+                        BadRequestError("The specified queue does not exist."));
+      }
+      return resp_ok(req, "");
+    }
+    case SQSListQueueTags: {
+      auto body = ListQueueTagsInput::from_str(req->body());
+      if (!body.has_value()) {
+        return resp_err(req, BadRequestError("invalid request body"));
+      }
+      auto tags = sqs->get_queue_tags(body.value().get_queue_url());
+      if (!tags.has_value()) {
+        return resp_err(req,
+                        BadRequestError("The specified queue does not exist."));
+      }
+      auto res = ListQueueTagsResponse{tags.value()};
+      return resp_ok(req, to_json(&res));
+    }
     default:
       return resp_err(req, Error(restinio::status_not_implemented(),
                                  "action not implemented"));

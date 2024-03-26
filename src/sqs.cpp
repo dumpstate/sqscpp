@@ -47,4 +47,26 @@ bool SQS::delete_queue(std::string qurl) {
   queues.erase(qurl);
   return true;
 }
+
+bool SQS::tag_queue(std::string qurl,
+                    std::map<std::string, std::string>* tags) {
+  if (queues.find(qurl) == queues.end()) {
+    return false;
+  }
+  if (queue_tags.find(qurl) == queue_tags.end()) {
+    queue_tags[qurl] = std::map<std::string, std::string>();
+  }
+  for (const auto& tag : *tags) {
+    queue_tags[qurl][tag.first] = tag.second;
+  }
+  return true;
+}
+
+std::optional<std::map<std::string, std::string>*> SQS::get_queue_tags(
+    std::string qurl) {
+  if (queues.find(qurl) == queues.end()) {
+    return {};
+  }
+  return &queue_tags[qurl];
+}
 }  // namespace sqscpp

@@ -110,3 +110,28 @@ TEST(protocol_test, get_queue_url_response_to_str) {
 
   EXPECT_EQ(str, "{\"QueueUrl\":\"http://localhost:9999/test-queue\"}");
 }
+
+TEST(protocol_test, tag_queue_input_from_str) {
+  auto res = TagQueueInput::from_str(
+      "{\"QueueUrl\":\"test-url\",\"Tags\":{\"key\":\"value\"}}");
+
+  EXPECT_EQ(res.has_value(), true);
+  EXPECT_EQ(res.value().get_queue_url(), "test-url");
+  EXPECT_EQ(res.value().get_tags().at("key"), "value");
+}
+
+TEST(protocol_test, list_queue_tags_input_from_str) {
+  auto res = ListQueueTagsInput::from_str("{\"QueueUrl\":\"test-url\"}");
+
+  EXPECT_EQ(res.has_value(), true);
+  EXPECT_EQ(res.value().get_queue_url(), "test-url");
+}
+
+TEST(protocol_test, list_queue_tags_response_to_str) {
+  auto res = new ListQueueTagsResponse();
+  std::map<std::string, std::string> tags = {{"key", "value"}};
+  res->tags = &tags;
+  auto str = to_json(res);
+
+  EXPECT_EQ(str, "{\"Tags\":{\"key\":\"value\"}}");
+}

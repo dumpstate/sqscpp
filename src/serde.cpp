@@ -31,6 +31,15 @@ std::optional<std::string> JsonSerde::parse_non_empty_string(json j) {
   }
 }
 
+std::optional<long> JsonSerde::parse_long(json j) {
+  if (j == nullptr || !j.is_number_integer()) return {};
+  try {
+    return j;
+  } catch (json::type_error& e) {
+    return {};
+  }
+}
+
 std::string JsonSerde::serialize(Error* err) {
   json j;
   j["Message"] = err->message;
@@ -147,6 +156,25 @@ JsonSerde::deserialize_untag_queue_input(std::string str) {
     if (!tags.has_value()) return {};
 
     return std::make_unique<UntagQueueInput>(qurl.value(), tags.value());
+  } catch (json::parse_error& e) {
+    return {};
+  }
+}
+
+std::optional<std::unique_ptr<SendMessageInput>>
+JsonSerde::deserialize_send_message_input(std::string str) {
+  try {
+    json j = json::parse(str);
+
+    auto qurl = parse_non_empty_string(j["QueueUrl"]);
+    if (!qurl.has_value()) return {};
+
+    auto msg = parse_non_empty_string(j["MessageBody"]);
+    if (!msg.has_value()) return {};
+
+    return std::make_unique<SendMessageInput>(qurl.value(), msg.value(),
+                                              parse_long(j["DelaySeconds"]),
+                                              j["MessageDeduplicationId"]);
   } catch (json::parse_error& e) {
     return {};
   }

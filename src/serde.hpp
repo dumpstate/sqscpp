@@ -30,6 +30,8 @@ class Serde {
   deserialize_list_queue_tags_input(std::string str) = 0;
   virtual std::optional<std::unique_ptr<UntagQueueInput>>
   deserialize_untag_queue_input(std::string str) = 0;
+  virtual std::optional<std::unique_ptr<SendMessageInput>>
+  deserialize_send_message_input(std::string str) = 0;
 };
 
 class JsonSerde : public Serde {
@@ -37,6 +39,7 @@ class JsonSerde : public Serde {
   std::optional<std::map<std::string, std::string>> parse_dict(json j);
   std::optional<std::vector<std::string>> parse_list(json j);
   std::optional<std::string> parse_non_empty_string(json j);
+  std::optional<long> parse_long(json j);
 
   std::string contentType() override { return "application/json"; }
 
@@ -58,6 +61,8 @@ class JsonSerde : public Serde {
   deserialize_list_queue_tags_input(std::string str) override;
   std::optional<std::unique_ptr<UntagQueueInput>> deserialize_untag_queue_input(
       std::string str) override;
+  std::optional<std::unique_ptr<SendMessageInput>>
+  deserialize_send_message_input(std::string str) override;
 };
 }  // namespace sqscpp
 

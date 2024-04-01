@@ -9,9 +9,9 @@ SQS::SQS(std::string ep) {
 
 std::string SQS::create_queue(CreateQueueInput* input) {
   std::string qurl = new_queue_url(input->get_queue_name());
-  std::map<std::string, std::string>* attrs = input->get_attrs();
+  std::map<std::string, std::string> attrs = input->get_attrs();
   queues[qurl] = std::vector<std::string>();
-  queue_attrs[qurl] = *attrs;
+  queue_attrs[qurl] = attrs;
   return qurl;
 }
 

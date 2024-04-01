@@ -54,7 +54,7 @@ TEST(json_serde_test, create_queue_input_from_str) {
 
   EXPECT_EQ(res.has_value(), true);
   EXPECT_EQ(res.value()->get_queue_name(), "test-queue");
-  EXPECT_EQ(res.value()->get_attrs()->at("DelaySeconds"), "5");
+  EXPECT_EQ(res.value()->get_attrs().at("DelaySeconds"), "5");
 }
 
 TEST(json_serde_test, create_queue_input_from_str_no_attrs) {
@@ -64,7 +64,7 @@ TEST(json_serde_test, create_queue_input_from_str_no_attrs) {
 
   EXPECT_EQ(res.has_value(), true);
   EXPECT_EQ(res.value()->get_queue_name(), "test-queue");
-  EXPECT_EQ(res.value()->get_attrs()->size(), 0);
+  EXPECT_EQ(res.value()->get_attrs().size(), 0);
 }
 
 TEST(json_serde_test, create_queue_input_from_str_empty) {

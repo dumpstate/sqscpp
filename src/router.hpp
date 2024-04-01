@@ -59,11 +59,8 @@ const std::map<std::string, SQSAction> AWS_SQS_ACTIONS = {
 
 std::function<restinio::request_handling_status_t(restinio::request_handle_t)>
 handler_factory(SQS* sqs, JsonSerde* serde);
-restinio::request_handling_status_t aws_json_handler(
-    SQS* sqs, JsonSerde* serde, restinio::http_request_header_t* headers,
-    restinio::request_handle_t req);
 restinio::request_handling_status_t aws_query_handler(
-    SQS* sqs, restinio::http_request_header_t* headers,
+    SQS* sqs, Serde* serde, restinio::http_request_header_t* headers,
     restinio::request_handle_t req);
 
 AWSProtocol extract_protocol(restinio::http_request_header_t* headers);

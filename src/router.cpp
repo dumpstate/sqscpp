@@ -11,15 +11,15 @@ handler_factory(SQS* sqs, JsonSerde* json_serde) {
     auto protocol = extract_protocol(&headers);
 
     if (protocol == AWSJsonProtocol1_0) {
-      return aws_json_handler(sqs, json_serde, &headers, req);
+      return aws_query_handler(sqs, json_serde, &headers, req);
     }
 
-    return aws_query_handler(sqs, &headers, req);
+    return restinio::request_rejected();
   };
 }
 
-restinio::request_handling_status_t aws_json_handler(
-    SQS* sqs, JsonSerde* serde, restinio::http_request_header_t* headers,
+restinio::request_handling_status_t aws_query_handler(
+    SQS* sqs, Serde* serde, restinio::http_request_header_t* headers,
     restinio::request_handle_t req) {
   auto trace_id = extract_trace_id(headers).value_or("");
   auto action = extract_action(headers);
@@ -126,12 +126,6 @@ restinio::request_handling_status_t resp_err(Serde* serde,
   return req->create_response(err.status)
       .set_body(serde->serialize(&err))
       .done();
-}
-
-restinio::request_handling_status_t aws_query_handler(
-    SQS* sqs, restinio::http_request_header_t* headers,
-    restinio::request_handle_t req) {
-  return restinio::request_rejected();
 }
 
 AWSProtocol extract_protocol(restinio::http_request_header_t* headers) {

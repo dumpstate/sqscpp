@@ -11,6 +11,7 @@ using json = nlohmann::json;
 namespace sqscpp {
 class Serde {
  public:
+  virtual std::string contentType() = 0;
   virtual std::string serialize(Error *err) = 0;
   virtual std::string serialize(CreateQueueResponse *res) = 0;
   virtual std::string serialize(ListQueuesResponse *res) = 0;
@@ -36,6 +37,8 @@ class JsonSerde : public Serde {
   std::optional<std::map<std::string, std::string>> parse_dict(json j);
   std::optional<std::vector<std::string>> parse_list(json j);
   std::optional<std::string> parse_non_empty_string(json j);
+
+  std::string contentType() override { return "application/json"; }
 
   std::string serialize(Error *err) override;
   std::string serialize(CreateQueueResponse *res) override;

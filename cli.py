@@ -80,6 +80,7 @@ def call_sqs(url: str, action: str, body: Any):
         headers={
             "Content-Type": "application/x-amz-json-1.0",
             "X-Amz-Target": f"AmazonSQS.{action}",
+            "X-Amzn-Trace-Id": str(uuid4()),
         },
         json=body,
     )

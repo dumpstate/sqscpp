@@ -11,14 +11,14 @@ handler_factory(SQS* sqs, JsonSerde* json_serde) {
     auto protocol = extract_protocol(&headers);
 
     if (protocol == AWSJsonProtocol1_0) {
-      return aws_query_handler(sqs, json_serde, &headers, req);
+      return sqs_query_handler(sqs, json_serde, &headers, req);
     }
 
     return restinio::request_rejected();
   };
 }
 
-restinio::request_handling_status_t aws_query_handler(
+restinio::request_handling_status_t sqs_query_handler(
     SQS* sqs, Serde* serde, restinio::http_request_header_t* headers,
     restinio::request_handle_t req) {
   auto trace_id = extract_trace_id(headers).value_or("");
@@ -37,12 +37,12 @@ restinio::request_handling_status_t aws_query_handler(
       }
       auto qurl = sqs->create_queue(body.value().get());
       auto res = CreateQueueResponse{qurl};
-      return resp_ok(req, serde->serialize(&res));
+      return resp_ok(serde, req, serde->serialize(&res));
     }
     case SQSListQueues: {
       auto qurls = sqs->get_queue_urls();
       auto res = ListQueuesResponse{qurls.get()};
-      return resp_ok(req, serde->serialize(&res));
+      return resp_ok(serde, req, serde->serialize(&res));
     }
     case SQSDeleteQueue: {
       auto body = serde->deserialize_delete_queue_input(req->body());
@@ -54,7 +54,7 @@ restinio::request_handling_status_t aws_query_handler(
         return resp_err(serde, req,
                         BadRequestError("The specified queue does not exist."));
       }
-      return resp_ok(req, "");
+      return resp_ok(serde, req, "{}");
     }
     case SQSGetQueueUrl: {
       auto body = serde->deserialize_get_queue_url_input(req->body());
@@ -67,7 +67,7 @@ restinio::request_handling_status_t aws_query_handler(
                         BadRequestError("The specified queue does not exist."));
       }
       auto res = GetQueueUrlResponse{qurl.value()};
-      return resp_ok(req, serde->serialize(&res));
+      return resp_ok(serde, req, serde->serialize(&res));
     }
     case SQSTagQueue: {
       auto body = serde->deserialize_tag_queue_input(req->body());
@@ -80,7 +80,7 @@ restinio::request_handling_status_t aws_query_handler(
         return resp_err(serde, req,
                         BadRequestError("The specified queue does not exist."));
       }
-      return resp_ok(req, "");
+      return resp_ok(serde, req, "{}");
     }
     case SQSListQueueTags: {
       auto body = serde->deserialize_list_queue_tags_input(req->body());
@@ -93,7 +93,7 @@ restinio::request_handling_status_t aws_query_handler(
                         BadRequestError("The specified queue does not exist."));
       }
       auto res = ListQueueTagsResponse{tags.value().get()};
-      return resp_ok(req, serde->serialize(&res));
+      return resp_ok(serde, req, serde->serialize(&res));
     }
     case SQSUntagQueue: {
       auto body = serde->deserialize_untag_queue_input(req->body());
@@ -106,7 +106,7 @@ restinio::request_handling_status_t aws_query_handler(
         return resp_err(serde, req,
                         BadRequestError("The specified queue does not exist."));
       }
-      return resp_ok(req, "");
+      return resp_ok(serde, req, "{}");
     }
     default:
       return resp_err(
@@ -115,15 +115,20 @@ restinio::request_handling_status_t aws_query_handler(
   }
 }
 
-restinio::request_handling_status_t resp_ok(restinio::request_handle_t req,
+restinio::request_handling_status_t resp_ok(Serde* serde,
+                                            restinio::request_handle_t req,
                                             std::string body) {
-  return req->create_response().set_body(std::move(body)).done();
+  return req->create_response()
+      .append_header(restinio::http_field::content_type, serde->contentType())
+      .set_body(std::move(body))
+      .done();
 }
 
 restinio::request_handling_status_t resp_err(Serde* serde,
                                              restinio::request_handle_t req,
                                              Error err) {
   return req->create_response(err.status)
+      .append_header(restinio::http_field::content_type, serde->contentType())
       .set_body(serde->serialize(&err))
       .done();
 }

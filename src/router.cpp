@@ -41,7 +41,7 @@ restinio::request_handling_status_t aws_query_handler(
     }
     case SQSListQueues: {
       auto qurls = sqs->get_queue_urls();
-      auto res = ListQueuesResponse{qurls};
+      auto res = ListQueuesResponse{qurls.get()};
       return resp_ok(req, serde->serialize(&res));
     }
     case SQSDeleteQueue: {
@@ -92,7 +92,7 @@ restinio::request_handling_status_t aws_query_handler(
         return resp_err(serde, req,
                         BadRequestError("The specified queue does not exist."));
       }
-      auto res = ListQueueTagsResponse{tags.value()};
+      auto res = ListQueueTagsResponse{tags.value().get()};
       return resp_ok(req, serde->serialize(&res));
     }
     case SQSUntagQueue: {

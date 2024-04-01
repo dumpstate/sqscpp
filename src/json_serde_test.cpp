@@ -95,7 +95,7 @@ TEST(json_serde_test, list_queues_response_to_str) {
   JsonSerde serde;
   ListQueuesResponse res;
   std::vector<std::string> qs = {"foo", "bar"};
-  res.queue_urls = qs;
+  res.queue_urls = &qs;
   auto str = serde.serialize(&res);
 
   EXPECT_EQ(str, "{\"QueueUrls\":[\"foo\",\"bar\"]}");

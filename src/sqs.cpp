@@ -21,14 +21,14 @@ std::string SQS::new_queue_url(std::string qname) {
   return ss.str();
 }
 
-std::vector<std::string> SQS::get_queue_urls() {
+std::unique_ptr<std::vector<std::string>> SQS::get_queue_urls() {
   std::vector<std::string> urls;
 
   for (const auto q : queues) {
     urls.push_back(q.first);
   }
 
-  return urls;
+  return std::make_unique<std::vector<std::string>>(urls);
 }
 
 std::optional<std::string> SQS::get_queue_url(std::string qname) {
@@ -62,12 +62,12 @@ bool SQS::tag_queue(std::string qurl,
   return true;
 }
 
-std::optional<std::map<std::string, std::string>*> SQS::get_queue_tags(
-    std::string qurl) {
+std::optional<std::unique_ptr<std::map<std::string, std::string>>>
+SQS::get_queue_tags(std::string qurl) {
   if (queues.find(qurl) == queues.end()) {
     return {};
   }
-  return &queue_tags[qurl];
+  return std::make_unique<std::map<std::string, std::string>>(queue_tags[qurl]);
 }
 
 bool SQS::untag_queue(std::string qurl, std::vector<std::string>* tag_keys) {

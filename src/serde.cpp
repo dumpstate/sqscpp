@@ -45,7 +45,7 @@ std::string JsonSerde::serialize(CreateQueueResponse* res) {
 
 std::string JsonSerde::serialize(ListQueuesResponse* res) {
   json j;
-  j["QueueUrls"] = res->queue_urls;
+  j["QueueUrls"] = *(res->queue_urls);
   return j.dump();
 }
 

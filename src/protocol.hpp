@@ -91,7 +91,7 @@ struct CreateQueueResponse {
 };
 
 struct ListQueuesResponse {
-  std::vector<std::string> queue_urls;
+  std::vector<std::string>* queue_urls;
 };
 
 struct GetQueueUrlResponse {

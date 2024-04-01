@@ -1,0 +1,11 @@
+services:
+  app_test:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    image: sqscpp-dev
+    entrypoint: /bin/make
+    working_dir: /usr/app
+    volumes:
+      - ./:/usr/app
+    command: ["run_test"]

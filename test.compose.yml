@@ -1,8 +1,0 @@
-services:
-  app_test:
-    image: dumpstate/sqscpp-dev:latest
-    entrypoint: /bin/make
-    working_dir: /usr/app
-    volumes:
-      - ./:/usr/app
-    command: ["run_test"]

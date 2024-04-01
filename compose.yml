@@ -6,5 +6,12 @@ services:
     image: sqscpp-dev
     entrypoint: /bin/bash
     working_dir: /usr/app
-    volumes:
-      - ./:/usr/app
+    volumes: ["./:/usr/app"]
+
+  app_test:
+    profiles: ["test"]
+    image: dumpstate/sqscpp-dev:latest
+    entrypoint: /bin/make
+    working_dir: /usr/app
+    volumes: ["./:/usr/app"]
+    command: ["run_test"]

@@ -4,6 +4,7 @@
 #include <restinio/core.hpp>
 
 #include "protocol.hpp"
+#include "serde.hpp"
 #include "sqs.hpp"
 
 namespace sqscpp {
@@ -57,9 +58,9 @@ const std::map<std::string, SQSAction> AWS_SQS_ACTIONS = {
     {"AmazonSQS.UntagQueue", SQSUntagQueue}};
 
 std::function<restinio::request_handling_status_t(restinio::request_handle_t)>
-handler_factory(SQS* sqs);
+handler_factory(SQS* sqs, JsonSerde* serde);
 restinio::request_handling_status_t aws_json_handler(
-    SQS* sqs, restinio::http_request_header_t* headers,
+    SQS* sqs, JsonSerde* serde, restinio::http_request_header_t* headers,
     restinio::request_handle_t req);
 restinio::request_handling_status_t aws_query_handler(
     SQS* sqs, restinio::http_request_header_t* headers,
@@ -74,7 +75,8 @@ std::string to_str(AWSProtocol protocol);
 
 restinio::request_handling_status_t resp_ok(restinio::request_handle_t req,
                                             std::string body);
-restinio::request_handling_status_t resp_err(restinio::request_handle_t req,
+restinio::request_handling_status_t resp_err(Serde* serde,
+                                             restinio::request_handle_t req,
                                              Error err);
 }  // namespace sqscpp
 

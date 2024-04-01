@@ -19,11 +19,13 @@ auto main(int argc, char *argv[]) -> int {
                            restinio::single_threaded_ostream_logger_t>;
 
     auto sqs = sqscpp::SQS(endpoint_url(&args));
+    auto json_serde = sqscpp::JsonSerde();
 
-    restinio::run(restinio::on_this_thread<traits_t>()
-                      .port(args.port)
-                      .address(args.host)
-                      .request_handler(sqscpp::handler_factory(&sqs)));
+    restinio::run(
+        restinio::on_this_thread<traits_t>()
+            .port(args.port)
+            .address(args.host)
+            .request_handler(sqscpp::handler_factory(&sqs, &json_serde)));
   } catch (const std::exception &ex) {
     std::cerr << "ERR: " << ex.what() << std::endl;
     return EXIT_FAILURE;

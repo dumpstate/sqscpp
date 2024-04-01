@@ -1,16 +1,17 @@
 #include "router.hpp"
 
 #include "protocol.hpp"
+#include "serde.hpp"
 
 namespace sqscpp {
 std::function<restinio::request_handling_status_t(restinio::request_handle_t)>
-handler_factory(SQS* sqs) {
-  return [sqs](restinio::request_handle_t req) {
+handler_factory(SQS* sqs, JsonSerde* json_serde) {
+  return [sqs, json_serde](restinio::request_handle_t req) {
     auto headers = req->header();
     auto protocol = extract_protocol(&headers);
 
     if (protocol == AWSJsonProtocol1_0) {
-      return aws_json_handler(sqs, &headers, req);
+      return aws_json_handler(sqs, json_serde, &headers, req);
     }
 
     return aws_query_handler(sqs, &headers, req);
@@ -18,97 +19,99 @@ handler_factory(SQS* sqs) {
 }
 
 restinio::request_handling_status_t aws_json_handler(
-    SQS* sqs, restinio::http_request_header_t* headers,
+    SQS* sqs, JsonSerde* serde, restinio::http_request_header_t* headers,
     restinio::request_handle_t req) {
   auto trace_id = extract_trace_id(headers).value_or("");
   auto action = extract_action(headers);
 
   if (!action.has_value()) {
-    return resp_err(req, BadRequestError(AWS_TARGET + " header not found"));
+    return resp_err(serde, req,
+                    BadRequestError(AWS_TARGET + " header not found"));
   }
 
   switch (action.value()) {
     case SQSCreateQueue: {
-      auto body = CreateQueueInput::from_str(req->body());
+      auto body = serde->deserialize_create_queue_input(req->body());
       if (!body.has_value()) {
-        return resp_err(req, BadRequestError("invalid request body"));
+        return resp_err(serde, req, BadRequestError("invalid request body"));
       }
-      auto qurl = sqs->create_queue(&body.value());
+      auto qurl = sqs->create_queue(body.value().get());
       auto res = CreateQueueResponse{qurl};
-      return resp_ok(req, to_json(&res));
+      return resp_ok(req, serde->serialize(&res));
     }
     case SQSListQueues: {
       auto qurls = sqs->get_queue_urls();
       auto res = ListQueuesResponse{qurls};
-      return resp_ok(req, to_json(&res));
+      return resp_ok(req, serde->serialize(&res));
     }
     case SQSDeleteQueue: {
-      auto body = DeleteQueueInput::from_str(req->body());
+      auto body = serde->deserialize_delete_queue_input(req->body());
       if (!body.has_value()) {
-        return resp_err(req, BadRequestError("invalid request body"));
+        return resp_err(serde, req, BadRequestError("invalid request body"));
       }
-      auto qurl = body.value().get_queue_url();
+      auto qurl = body.value()->get_queue_url();
       if (!sqs->delete_queue(qurl)) {
-        return resp_err(req,
+        return resp_err(serde, req,
                         BadRequestError("The specified queue does not exist."));
       }
       return resp_ok(req, "");
     }
     case SQSGetQueueUrl: {
-      auto body = GetQueueUrlInput::from_str(req->body());
+      auto body = serde->deserialize_get_queue_url_input(req->body());
       if (!body.has_value()) {
-        return resp_err(req, BadRequestError("invalid request body"));
+        return resp_err(serde, req, BadRequestError("invalid request body"));
       }
-      auto qurl = sqs->get_queue_url(body.value().get_queue_name());
+      auto qurl = sqs->get_queue_url(body.value()->get_queue_name());
       if (!qurl.has_value()) {
-        return resp_err(req,
+        return resp_err(serde, req,
                         BadRequestError("The specified queue does not exist."));
       }
       auto res = GetQueueUrlResponse{qurl.value()};
-      return resp_ok(req, to_json(&res));
+      return resp_ok(req, serde->serialize(&res));
     }
     case SQSTagQueue: {
-      auto body = TagQueueInput::from_str(req->body());
+      auto body = serde->deserialize_tag_queue_input(req->body());
       if (!body.has_value()) {
-        return resp_err(req, BadRequestError("invalid request body"));
+        return resp_err(serde, req, BadRequestError("invalid request body"));
       }
-      auto tags = body.value().get_tags();
-      auto ok = sqs->tag_queue(body.value().get_queue_url(), &tags);
+      auto tags = body.value()->get_tags();
+      auto ok = sqs->tag_queue(body.value()->get_queue_url(), &tags);
       if (!ok) {
-        return resp_err(req,
+        return resp_err(serde, req,
                         BadRequestError("The specified queue does not exist."));
       }
       return resp_ok(req, "");
     }
     case SQSListQueueTags: {
-      auto body = ListQueueTagsInput::from_str(req->body());
+      auto body = serde->deserialize_list_queue_tags_input(req->body());
       if (!body.has_value()) {
-        return resp_err(req, BadRequestError("invalid request body"));
+        return resp_err(serde, req, BadRequestError("invalid request body"));
       }
-      auto tags = sqs->get_queue_tags(body.value().get_queue_url());
+      auto tags = sqs->get_queue_tags(body.value()->get_queue_url());
       if (!tags.has_value()) {
-        return resp_err(req,
+        return resp_err(serde, req,
                         BadRequestError("The specified queue does not exist."));
       }
       auto res = ListQueueTagsResponse{tags.value()};
-      return resp_ok(req, to_json(&res));
+      return resp_ok(req, serde->serialize(&res));
     }
     case SQSUntagQueue: {
-      auto body = UntagQueueInput::from_str(req->body());
+      auto body = serde->deserialize_untag_queue_input(req->body());
       if (!body.has_value()) {
-        return resp_err(req, BadRequestError("invalid request body"));
+        return resp_err(serde, req, BadRequestError("invalid request body"));
       }
-      auto keys = body.value().get_tag_keys();
-      auto ok = sqs->untag_queue(body.value().get_queue_url(), &keys);
+      auto keys = body.value()->get_tag_keys();
+      auto ok = sqs->untag_queue(body.value()->get_queue_url(), &keys);
       if (!ok) {
-        return resp_err(req,
+        return resp_err(serde, req,
                         BadRequestError("The specified queue does not exist."));
       }
       return resp_ok(req, "");
     }
     default:
-      return resp_err(req, Error(restinio::status_not_implemented(),
-                                 "action not implemented"));
+      return resp_err(
+          serde, req,
+          Error(restinio::status_not_implemented(), "action not implemented"));
   }
 }
 
@@ -117,9 +120,12 @@ restinio::request_handling_status_t resp_ok(restinio::request_handle_t req,
   return req->create_response().set_body(std::move(body)).done();
 }
 
-restinio::request_handling_status_t resp_err(restinio::request_handle_t req,
+restinio::request_handling_status_t resp_err(Serde* serde,
+                                             restinio::request_handle_t req,
                                              Error err) {
-  return req->create_response(err.status).set_body(to_json(&err)).done();
+  return req->create_response(err.status)
+      .set_body(serde->serialize(&err))
+      .done();
 }
 
 restinio::request_handling_status_t aws_query_handler(

@@ -1,4 +1,5 @@
-VCPKG_HOME	=	/opt/vcpkg
+VCPKG_HOME		=	/opt/vcpkg
+DOCKER_IMAGE	=	dumpstate/sqscpp-dev
 
 dev:
 	docker compose run -p 8080:8080 --rm app
@@ -18,3 +19,7 @@ run_test: run_build
 
 run_fmt:
 	find src -regex '.*\.\(cpp\|hpp\)' | xargs clang-format -style=Google -i
+
+build_and_publish_docker:
+	docker build -f dev.Dockerfile -t ${DOCKER_IMAGE}:latest .
+	docker push ${DOCKER_IMAGE}:latest

@@ -64,6 +64,32 @@ class JsonSerde : public Serde {
   std::optional<std::unique_ptr<SendMessageInput>>
   deserialize_send_message_input(std::string str) override;
 };
+
+class HtmlSerde : public Serde {
+ public:
+  std::string contentType() override { return "text/html"; }
+
+  std::string serialize(Error *err) override;
+  std::string serialize(CreateQueueResponse *res) override;
+  std::string serialize(ListQueuesResponse *res) override;
+  std::string serialize(GetQueueUrlResponse *res) override;
+  std::string serialize(ListQueueTagsResponse *res) override;
+
+  std::optional<std::unique_ptr<CreateQueueInput>>
+  deserialize_create_queue_input(std::string str) override;
+  std::optional<std::unique_ptr<GetQueueUrlInput>>
+  deserialize_get_queue_url_input(std::string str) override;
+  std::optional<std::unique_ptr<DeleteQueueInput>>
+  deserialize_delete_queue_input(std::string str) override;
+  std::optional<std::unique_ptr<TagQueueInput>> deserialize_tag_queue_input(
+      std::string str) override;
+  std::optional<std::unique_ptr<ListQueueTagsInput>>
+  deserialize_list_queue_tags_input(std::string str) override;
+  std::optional<std::unique_ptr<UntagQueueInput>> deserialize_untag_queue_input(
+      std::string str) override;
+  std::optional<std::unique_ptr<SendMessageInput>>
+  deserialize_send_message_input(std::string str) override;
+};
 }  // namespace sqscpp
 
 #endif  // SQSCPP_SERDE_H

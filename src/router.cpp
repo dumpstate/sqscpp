@@ -5,16 +5,19 @@
 
 namespace sqscpp {
 std::function<restinio::request_handling_status_t(restinio::request_handle_t)>
-handler_factory(SQS* sqs, JsonSerde* json_serde) {
-  return [sqs, json_serde](restinio::request_handle_t req) {
+handler_factory(SQS* sqs, JsonSerde* json_serde, HtmlSerde* html_serde) {
+  return [sqs, json_serde, html_serde](restinio::request_handle_t req) {
     auto headers = req->header();
     auto protocol = extract_protocol(&headers);
 
-    if (protocol == AWSJsonProtocol1_0) {
-      return sqs_query_handler(sqs, json_serde, &headers, req);
+    switch (protocol) {
+      case AWSJsonProtocol1_0:
+        return sqs_query_handler(sqs, json_serde, &headers, req);
+      case TextHtml:
+        return html_query_handler(sqs, html_serde, &headers, req);
+      default:
+        return restinio::request_rejected();
     }
-
-    return restinio::request_rejected();
   };
 }
 
@@ -123,6 +126,16 @@ restinio::request_handling_status_t sqs_query_handler(
   }
 }
 
+restinio::request_handling_status_t html_query_handler(
+    SQS* sqs, Serde* serde, restinio::http_request_header_t* headers,
+    restinio::request_handle_t req) {
+  auto path = req->header().path();
+  if (path == "/") {
+    headers->set_field(AWS_TARGET, "AmazonSQS.ListQueues");
+  }
+  return sqs_query_handler(sqs, serde, headers, req);
+}
+
 restinio::request_handling_status_t resp_ok(Serde* serde,
                                             restinio::request_handle_t req,
                                             std::string body) {
@@ -143,11 +156,12 @@ restinio::request_handling_status_t resp_err(Serde* serde,
 
 AWSProtocol extract_protocol(restinio::http_request_header_t* headers) {
   auto content_type = headers->opt_value_of(restinio::http_field::content_type);
-  if (content_type.has_value() &&
-      content_type.value() == AWS_JSON_PROTOCOL_1_0) {
-    return AWSJsonProtocol1_0;
+  if (content_type.has_value()) {
+    if (content_type.value() == AWS_JSON_PROTOCOL_1_0)
+      return AWSJsonProtocol1_0;
+    if (content_type.value() == AWS_QUERY_PROTOCOL) return AWSQueryProtocol;
   }
-  return AWSQueryProtocol;
+  return TextHtml;
 }
 
 std::optional<std::string> extract_trace_id(
@@ -173,14 +187,4 @@ std::optional<SQSAction> extract_action(
   return {};
 }
 
-std::string to_str(AWSProtocol protocol) {
-  switch (protocol) {
-    case AWSQueryProtocol:
-      return "AWSQueryProtocol";
-    case AWSJsonProtocol1_0:
-      return "AWSJsonProtocol1.0";
-    default:
-      throw std::exception();
-  }
-}
 }  // namespace sqscpp

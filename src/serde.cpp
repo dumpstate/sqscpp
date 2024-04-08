@@ -180,4 +180,73 @@ JsonSerde::deserialize_send_message_input(std::string str) {
   }
 }
 
+std::string HtmlSerde::serialize(Error* err) {
+  std::stringstream ss;
+  ss << "<html><body><h1>Error</h1><p>" << err->message << "</p></body></html>";
+  return ss.str();
+}
+
+std::string HtmlSerde::serialize(CreateQueueResponse* res) {
+  throw std::runtime_error("not implemented");
+}
+
+std::string HtmlSerde::serialize(ListQueuesResponse* res) {
+  std::stringstream ss;
+  ss << "<html><body><h1>Queues</h1>";
+  if (res->queue_urls->empty()) {
+    ss << "<p>No queues found</p>";
+  } else {
+    ss << "<ul>";
+    for (const auto& url : *(res->queue_urls)) {
+      ss << "<li><a href=\"" << url << "\">" << url << "</a></li>";
+    }
+    ss << "</ul>";
+  }
+  ss << "</body></html>";
+  return ss.str();
+}
+
+std::string HtmlSerde::serialize(GetQueueUrlResponse* res) {
+  throw std::runtime_error("not implemented");
+}
+
+std::string HtmlSerde::serialize(ListQueueTagsResponse* res) {
+  throw std::runtime_error("not implemented");
+}
+
+std::optional<std::unique_ptr<CreateQueueInput>>
+HtmlSerde::deserialize_create_queue_input(std::string str) {
+  throw std::runtime_error("not implemented");
+}
+
+std::optional<std::unique_ptr<GetQueueUrlInput>>
+HtmlSerde::deserialize_get_queue_url_input(std::string str) {
+  throw std::runtime_error("not implemented");
+}
+
+std::optional<std::unique_ptr<DeleteQueueInput>>
+HtmlSerde::deserialize_delete_queue_input(std::string str) {
+  throw std::runtime_error("not implemented");
+}
+
+std::optional<std::unique_ptr<TagQueueInput>>
+HtmlSerde::deserialize_tag_queue_input(std::string str) {
+  throw std::runtime_error("not implemented");
+}
+
+std::optional<std::unique_ptr<ListQueueTagsInput>>
+HtmlSerde::deserialize_list_queue_tags_input(std::string str) {
+  throw std::runtime_error("not implemented");
+}
+
+std::optional<std::unique_ptr<UntagQueueInput>>
+HtmlSerde::deserialize_untag_queue_input(std::string str) {
+  throw std::runtime_error("not implemented");
+}
+
+std::optional<std::unique_ptr<SendMessageInput>>
+HtmlSerde::deserialize_send_message_input(std::string str) {
+  throw std::runtime_error("not implemented");
+}
+
 }  // namespace sqscpp

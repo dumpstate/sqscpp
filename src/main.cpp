@@ -20,12 +20,13 @@ auto main(int argc, char *argv[]) -> int {
 
     auto sqs = sqscpp::SQS(endpoint_url(&args));
     auto json_serde = sqscpp::JsonSerde();
+    auto html_serde = sqscpp::HtmlSerde();
 
-    restinio::run(
-        restinio::on_this_thread<traits_t>()
-            .port(args.port)
-            .address(args.host)
-            .request_handler(sqscpp::handler_factory(&sqs, &json_serde)));
+    restinio::run(restinio::on_this_thread<traits_t>()
+                      .port(args.port)
+                      .address(args.host)
+                      .request_handler(sqscpp::handler_factory(
+                          &sqs, &json_serde, &html_serde)));
   } catch (const std::exception &ex) {
     std::cerr << "ERR: " << ex.what() << std::endl;
     return EXIT_FAILURE;

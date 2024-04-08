@@ -8,7 +8,7 @@
 #include "sqs.hpp"
 
 namespace sqscpp {
-enum AWSProtocol { AWSQueryProtocol, AWSJsonProtocol1_0 };
+enum AWSProtocol { AWSQueryProtocol, AWSJsonProtocol1_0, TextHtml };
 enum SQSAction {
   SQSListQueues,
   SQSAddPermission,
@@ -33,6 +33,8 @@ enum SQSAction {
 };
 
 const std::string AWS_JSON_PROTOCOL_1_0 = "application/x-amz-json-1.0";
+const std::string AWS_QUERY_PROTOCOL = "text/xml";
+const std::string TEXT_HTML = "text/html";
 const std::string AWS_TRACE_ID = "x-amzn-trace-id";
 const std::string AWS_TARGET = "x-amz-target";
 const std::map<std::string, SQSAction> AWS_SQS_ACTIONS = {
@@ -58,8 +60,11 @@ const std::map<std::string, SQSAction> AWS_SQS_ACTIONS = {
     {"AmazonSQS.UntagQueue", SQSUntagQueue}};
 
 std::function<restinio::request_handling_status_t(restinio::request_handle_t)>
-handler_factory(SQS* sqs, JsonSerde* serde);
+handler_factory(SQS* sqs, JsonSerde* serde, HtmlSerde* html_serde);
 restinio::request_handling_status_t sqs_query_handler(
+    SQS* sqs, Serde* serde, restinio::http_request_header_t* headers,
+    restinio::request_handle_t req);
+restinio::request_handling_status_t html_query_handler(
     SQS* sqs, Serde* serde, restinio::http_request_header_t* headers,
     restinio::request_handle_t req);
 
@@ -68,7 +73,6 @@ std::optional<SQSAction> extract_action(
     restinio::http_request_header_t* headers);
 std::optional<std::string> extract_trace_id(
     restinio::http_request_header_t* headers);
-std::string to_str(AWSProtocol protocol);
 
 restinio::request_handling_status_t resp_ok(Serde* serde,
                                             restinio::request_handle_t req,

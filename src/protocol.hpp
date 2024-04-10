@@ -115,6 +115,7 @@ struct CreateQueueResponse {
 
 struct ListQueuesResponse {
   std::vector<std::string> *queue_urls;
+  int message_count = 0;
 };
 
 struct GetQueueUrlResponse {

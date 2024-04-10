@@ -66,6 +66,9 @@ class JsonSerde : public Serde {
 };
 
 class HtmlSerde : public Serde {
+ private:
+  std::string render_html(std::string &body);
+
  public:
   std::string contentType() override { return "text/html"; }
 
@@ -76,19 +79,33 @@ class HtmlSerde : public Serde {
   std::string serialize(ListQueueTagsResponse *res) override;
 
   std::optional<std::unique_ptr<CreateQueueInput>>
-  deserialize_create_queue_input(std::string str) override;
+  deserialize_create_queue_input(std::string str) override {
+    throw std::runtime_error("not implemented");
+  }
   std::optional<std::unique_ptr<GetQueueUrlInput>>
-  deserialize_get_queue_url_input(std::string str) override;
+  deserialize_get_queue_url_input(std::string str) override {
+    throw std::runtime_error("not implemented");
+  }
   std::optional<std::unique_ptr<DeleteQueueInput>>
-  deserialize_delete_queue_input(std::string str) override;
+  deserialize_delete_queue_input(std::string str) override {
+    throw std::runtime_error("not implemented");
+  }
   std::optional<std::unique_ptr<TagQueueInput>> deserialize_tag_queue_input(
-      std::string str) override;
+      std::string str) override {
+    throw std::runtime_error("not implemented");
+  }
   std::optional<std::unique_ptr<ListQueueTagsInput>>
-  deserialize_list_queue_tags_input(std::string str) override;
+  deserialize_list_queue_tags_input(std::string str) override {
+    throw std::runtime_error("not implemented");
+  }
   std::optional<std::unique_ptr<UntagQueueInput>> deserialize_untag_queue_input(
-      std::string str) override;
+      std::string str) override {
+    throw std::runtime_error("not implemented");
+  }
   std::optional<std::unique_ptr<SendMessageInput>>
-  deserialize_send_message_input(std::string str) override;
+  deserialize_send_message_input(std::string str) override {
+    throw std::runtime_error("not implemented");
+  }
 };
 }  // namespace sqscpp
 

@@ -180,10 +180,25 @@ JsonSerde::deserialize_send_message_input(std::string str) {
   }
 }
 
+std::string HtmlSerde::render_html(std::string& body) {
+  std::stringstream ss;
+  ss << "<!DOCTYPE html>";
+  ss << "<html>";
+  ss << "<head>";
+  ss << "<title>sqscpp</title>";
+  ss << "<link rel=\"stylesheet\" "
+        "href=\"https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css\">";
+  ss << "</head><body>";
+  ss << "<div class=\"container\">";
+  ss << body << "</div></body></html>";
+  return ss.str();
+}
+
 std::string HtmlSerde::serialize(Error* err) {
   std::stringstream ss;
-  ss << "<html><body><h1>Error</h1><p>" << err->message << "</p></body></html>";
-  return ss.str();
+  ss << "<h1 class=\"title\">Error</h1><p>" << err->message << "</p>";
+  auto body = ss.str();
+  return render_html(body);
 }
 
 std::string HtmlSerde::serialize(CreateQueueResponse* res) {
@@ -192,18 +207,29 @@ std::string HtmlSerde::serialize(CreateQueueResponse* res) {
 
 std::string HtmlSerde::serialize(ListQueuesResponse* res) {
   std::stringstream ss;
-  ss << "<html><body><h1>Queues</h1>";
+  ss << "<h1 class=\"title\">Queues</h1>";
   if (res->queue_urls->empty()) {
-    ss << "<p>No queues found</p>";
+    ss << "<p>No queues found.</p>";
   } else {
-    ss << "<ul>";
+    ss << "<table class=\"table is-fullwidth\">";
+    ss << "<thead>";
+    ss << "<tr>";
+    ss << "<th>Queue URL</th>";
+    ss << "<th>Message Count</th>";
+    ss << "</tr>";
+    ss << "</thead>";
+    ss << "<tbody>";
     for (const auto& url : *(res->queue_urls)) {
-      ss << "<li><a href=\"" << url << "\">" << url << "</a></li>";
+      ss << "<tr>";
+      ss << "<td><a href=\"" << url << "\">" << url << "</a></td>";
+      ss << "<td>" << res->message_count << "</td>";
+      ss << "</tr>";
     }
-    ss << "</ul>";
+    ss << "</tbody>";
+    ss << "</table>";
   }
-  ss << "</body></html>";
-  return ss.str();
+  auto body = ss.str();
+  return render_html(body);
 }
 
 std::string HtmlSerde::serialize(GetQueueUrlResponse* res) {
@@ -211,41 +237,6 @@ std::string HtmlSerde::serialize(GetQueueUrlResponse* res) {
 }
 
 std::string HtmlSerde::serialize(ListQueueTagsResponse* res) {
-  throw std::runtime_error("not implemented");
-}
-
-std::optional<std::unique_ptr<CreateQueueInput>>
-HtmlSerde::deserialize_create_queue_input(std::string str) {
-  throw std::runtime_error("not implemented");
-}
-
-std::optional<std::unique_ptr<GetQueueUrlInput>>
-HtmlSerde::deserialize_get_queue_url_input(std::string str) {
-  throw std::runtime_error("not implemented");
-}
-
-std::optional<std::unique_ptr<DeleteQueueInput>>
-HtmlSerde::deserialize_delete_queue_input(std::string str) {
-  throw std::runtime_error("not implemented");
-}
-
-std::optional<std::unique_ptr<TagQueueInput>>
-HtmlSerde::deserialize_tag_queue_input(std::string str) {
-  throw std::runtime_error("not implemented");
-}
-
-std::optional<std::unique_ptr<ListQueueTagsInput>>
-HtmlSerde::deserialize_list_queue_tags_input(std::string str) {
-  throw std::runtime_error("not implemented");
-}
-
-std::optional<std::unique_ptr<UntagQueueInput>>
-HtmlSerde::deserialize_untag_queue_input(std::string str) {
-  throw std::runtime_error("not implemented");
-}
-
-std::optional<std::unique_ptr<SendMessageInput>>
-HtmlSerde::deserialize_send_message_input(std::string str) {
   throw std::runtime_error("not implemented");
 }
 

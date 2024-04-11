@@ -4,6 +4,7 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <map>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -27,6 +28,7 @@ class SQS {
 
   std::string new_queue_url(std::string qname);
   long now();
+  std::mutex mtx;
 
  public:
   SQS(std::string ep);

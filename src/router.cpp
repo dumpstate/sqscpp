@@ -116,8 +116,11 @@ restinio::request_handling_status_t sqs_query_handler(
       if (!body.has_value()) {
         return resp_err(serde, req, BadRequestError("invalid request body"));
       }
-      // TODO
-      return restinio::request_rejected();
+      if (!sqs->send_message(body.value().get())) {
+        return resp_err(serde, req,
+                        BadRequestError("The specified queue does not exist."));
+      }
+      return resp_ok(serde, req, "{}");
     }
     default:
       return resp_err(

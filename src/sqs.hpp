@@ -27,6 +27,8 @@ class SQS {
   std::optional<std::unique_ptr<std::map<std::string, std::string>>>
   get_queue_tags(std::string qurl);
   bool untag_queue(std::string qurl, std::vector<std::string>* tag_keys);
+  bool send_message(SendMessageInput* input);
+  int get_message_count(std::string& qurl);
 };
 }  // namespace sqscpp
 

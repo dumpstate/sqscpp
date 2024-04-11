@@ -2,6 +2,7 @@
 
 
 import http.client as http_client
+import json
 import logging
 import requests
 
@@ -25,6 +26,7 @@ def parse_args():
             "list-queues",
             "tag-queue",
             "untag-queue",
+            "send-message",
         ],
     )
     parser.add_argument(
@@ -126,6 +128,13 @@ def untag_queue(url: str, qurl: str, tag_keys: list[str]):
     })
 
 
+def send_message(url: str, qurl: str, message: dict):
+    return call_sqs(url, "SendMessage", {
+        "QueueUrl": qurl,
+        "MessageBody": json.dumps(message),
+    })
+
+
 def smoke_test(args: Namespace):
     url = base_url(args)
     qnames = [f"test-{uuid4()}" for _ in range(4)]
@@ -192,6 +201,10 @@ def main():
         if not args.tag:
             raise ValueError("Tag is required")
         untag_queue(base_url(args), args.queue_url, [args.tag])
+    elif args.command == "send-message":
+        if not args.queue_url:
+            raise ValueError("Queue URL is required")
+        send_message(base_url(args), args.queue_url, {"key": "value"})
 
 
 if __name__ == "__main__":

@@ -172,9 +172,9 @@ JsonSerde::deserialize_send_message_input(std::string str) {
     auto msg = parse_non_empty_string(j["MessageBody"]);
     if (!msg.has_value()) return {};
 
-    return std::make_unique<SendMessageInput>(qurl.value(), msg.value(),
-                                              parse_long(j["DelaySeconds"]),
-                                              j["MessageDeduplicationId"]);
+    return std::make_unique<SendMessageInput>(
+        qurl.value(), msg.value(), parse_long(j["DelaySeconds"]),
+        parse_non_empty_string(j["MessageDeduplicationId"]));
   } catch (json::parse_error& e) {
     return {};
   }
@@ -221,7 +221,7 @@ std::string HtmlSerde::serialize(ListQueuesResponse* res) {
     ss << "<tbody>";
     for (const auto& url : *(res->queue_urls)) {
       ss << "<tr>";
-      ss << "<td><a href=\"" << url << "\">" << url << "</a></td>";
+      ss << "<td>" << url << "</td>";
       ss << "<td>" << res->message_count << "</td>";
       ss << "</tr>";
     }

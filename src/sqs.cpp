@@ -82,4 +82,23 @@ bool SQS::untag_queue(std::string qurl, std::vector<std::string>* tag_keys) {
   }
   return true;
 }
+
+bool SQS::send_message(SendMessageInput* msg) {
+  auto queue = queues.find(msg->get_queue_url());
+  if (queue == queues.end()) {
+    return false;
+  }
+
+  queue->second.push_back(msg->get_message_body());
+  return true;
+}
+
+int SQS::get_message_count(std::string& qurl) {
+  auto queue = queues.find(qurl);
+  if (queue == queues.end()) {
+    return -1;
+  }
+
+  return queue->second.size();
+}
 }  // namespace sqscpp

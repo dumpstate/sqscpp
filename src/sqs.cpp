@@ -101,4 +101,14 @@ int SQS::get_message_count(std::string& qurl) {
 
   return queue->second.size();
 }
+
+bool SQS::purge_queue(std::string qurl) {
+  auto queue = queues.find(qurl);
+  if (queue == queues.end()) {
+    return false;
+  }
+
+  queue->second.clear();
+  return true;
+}
 }  // namespace sqscpp

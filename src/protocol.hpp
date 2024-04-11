@@ -46,6 +46,15 @@ class DeleteQueueInput {
   std::string &get_queue_url() { return queue_url; }
 };
 
+class PurgeQueueInput {
+ private:
+  std::string queue_url;
+
+ public:
+  PurgeQueueInput(std::string qurl) : queue_url(qurl){};
+  std::string &get_queue_url() { return queue_url; }
+};
+
 class TagQueueInput {
  private:
   std::string queue_url;

@@ -127,6 +127,17 @@ restinio::request_handling_status_t sqs_query_handler(
       }
       return resp_ok(serde, req, "{}");
     }
+    case SQSPurgeQueue: {
+      auto body = serde->deserialize_purge_queue_input(req->body());
+      if (!body.has_value()) {
+        return resp_err(serde, req, BadRequestError("invalid request body"));
+      }
+      if (!sqs->purge_queue(body.value()->get_queue_url())) {
+        return resp_err(serde, req,
+                        BadRequestError("The specified queue does not exist."));
+      }
+      return resp_ok(serde, req, "{}");
+    }
     default:
       return resp_err(
           serde, req,

@@ -184,6 +184,20 @@ JsonSerde::deserialize_send_message_input(std::string str) {
   }
 }
 
+std::optional<std::unique_ptr<PurgeQueueInput>>
+JsonSerde::deserialize_purge_queue_input(std::string str) {
+  try {
+    json j = json::parse(str);
+
+    auto qurl = parse_non_empty_string(j["QueueUrl"]);
+    if (!qurl.has_value()) return {};
+
+    return std::make_unique<PurgeQueueInput>(qurl.value());
+  } catch (json::parse_error& e) {
+    return {};
+  }
+}
+
 std::string HtmlSerde::render_html(std::string& body) {
   std::stringstream ss;
   ss << "<!DOCTYPE html>";

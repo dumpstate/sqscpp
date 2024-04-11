@@ -32,6 +32,8 @@ class Serde {
   deserialize_untag_queue_input(std::string str) = 0;
   virtual std::optional<std::unique_ptr<SendMessageInput>>
   deserialize_send_message_input(std::string str) = 0;
+  virtual std::optional<std::unique_ptr<PurgeQueueInput>>
+  deserialize_purge_queue_input(std::string str) = 0;
 };
 
 class JsonSerde : public Serde {
@@ -63,6 +65,8 @@ class JsonSerde : public Serde {
       std::string str) override;
   std::optional<std::unique_ptr<SendMessageInput>>
   deserialize_send_message_input(std::string str) override;
+  std::optional<std::unique_ptr<PurgeQueueInput>> deserialize_purge_queue_input(
+      std::string str) override;
 };
 
 class HtmlSerde : public Serde {
@@ -104,6 +108,10 @@ class HtmlSerde : public Serde {
   }
   std::optional<std::unique_ptr<SendMessageInput>>
   deserialize_send_message_input(std::string str) override {
+    throw std::runtime_error("not implemented");
+  }
+  std::optional<std::unique_ptr<PurgeQueueInput>> deserialize_purge_queue_input(
+      std::string str) override {
     throw std::runtime_error("not implemented");
   }
 };

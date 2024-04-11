@@ -166,3 +166,11 @@ TEST(json_serde_test, untag_queue_input_from_str) {
   EXPECT_EQ(res.value()->get_queue_url(), "test-url");
   EXPECT_EQ(res.value()->get_tag_keys().at(0), "key");
 }
+
+TEST(json_serde_test, purge_queue_input_from_str) {
+  JsonSerde serde;
+  auto res = serde.deserialize_purge_queue_input("{\"QueueUrl\":\"test-url\"}");
+
+  EXPECT_EQ(res.has_value(), true);
+  EXPECT_EQ(res.value()->get_queue_url(), "test-url");
+}

@@ -27,6 +27,7 @@ def parse_args():
             "tag-queue",
             "untag-queue",
             "send-message",
+            "purge-queue",
         ],
     )
     parser.add_argument(
@@ -135,6 +136,10 @@ def send_message(url: str, qurl: str, message: dict):
     })
 
 
+def purge_queue(url: str, qurl: str):
+    return call_sqs(url, "PurgeQueue", {"QueueUrl": qurl})
+
+
 def smoke_test(args: Namespace):
     url = base_url(args)
     qnames = [f"test-{uuid4()}" for _ in range(4)]
@@ -149,6 +154,14 @@ def smoke_test(args: Namespace):
     print(list_queue_tags(url, get_queue_url(url, qname)))
     untag_queue(url, get_queue_url(url, qname), ["key"])
     print(list_queue_tags(url, get_queue_url(url, qname)))
+
+    for qname in qnames:
+        print(f"Sending message to {qname}")
+        send_message(url, get_queue_url(url, qname), {"key": "value"})
+
+    for qname in qnames:
+        print(f"Purging {qname}")
+        purge_queue(url, get_queue_url(url, qname))
 
     for qname in qnames:
         print(f"Deleting queue {qname}")
@@ -205,6 +218,10 @@ def main():
         if not args.queue_url:
             raise ValueError("Queue URL is required")
         send_message(base_url(args), args.queue_url, {"key": "value"})
+    elif args.command == "purge-queue":
+        if not args.queue_url:
+            raise ValueError("Queue URL is required")
+        purge_queue(base_url(args), args.queue_url)
 
 
 if __name__ == "__main__":

@@ -148,12 +148,13 @@ restinio::request_handling_status_t sqs_query_handler(
         return resp_err(serde, req,
                         BadRequestError("Failed to receive message."));
       }
-      auto res = ReceivedMessageResponse{
-          msg.value().message_id,
-          "",
-          msg.value().md5_of_body,
-          msg.value().body,
-      };
+      auto res = ReceivedMessagesResponse{
+          std::vector<ReceivedMessageResponse>{ReceivedMessageResponse{
+              msg.value().message_id,
+              msg.value().message_id,
+              msg.value().md5_of_body,
+              msg.value().body,
+          }}};
       return resp_ok(serde, req, serde->serialize(&res));
     }
     default:

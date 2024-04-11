@@ -176,6 +176,10 @@ struct ReceivedMessageResponse {
   std::string body;
 };
 
+struct ReceivedMessagesResponse {
+  std::vector<ReceivedMessageResponse> messages;
+};
+
 }  // namespace sqscpp
 
 #endif  // SQSCPP_PROTOCOL_H

@@ -143,18 +143,15 @@ restinio::request_handling_status_t sqs_query_handler(
       if (!body.has_value()) {
         return resp_err(serde, req, BadRequestError("invalid request body"));
       }
-      auto msg = sqs->receive(body.value().get()->get_queue_url());
-      if (!msg.has_value()) {
-        return resp_err(serde, req,
-                        BadRequestError("Failed to receive message."));
+      auto msgs = sqs->receive(
+          body.value().get()->get_queue_url(),
+          body.value().get()->get_max_number_of_messages().value_or(1));
+      std::vector<ReceivedMessageResponse> res_msgs;
+      for (auto& msg : msgs) {
+        res_msgs.push_back(ReceivedMessageResponse{
+            msg.message_id, msg.message_id, msg.md5_of_body, msg.body});
       }
-      auto res = ReceivedMessagesResponse{
-          std::vector<ReceivedMessageResponse>{ReceivedMessageResponse{
-              msg.value().message_id,
-              msg.value().message_id,
-              msg.value().md5_of_body,
-              msg.value().body,
-          }}};
+      auto res = ReceivedMessagesResponse{res_msgs};
       return resp_ok(serde, req, serde->serialize(&res));
     }
     default:

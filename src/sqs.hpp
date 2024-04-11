@@ -14,6 +14,7 @@ struct Message {
   std::string message_id;
   std::string md5_of_body;
   std::string body;
+  long visible_at;
 };
 
 class SQS {
@@ -25,6 +26,7 @@ class SQS {
   std::map<std::string, std::map<std::string, std::string>> queue_tags;
 
   std::string new_queue_url(std::string qname);
+  long now();
 
  public:
   SQS(std::string ep);
@@ -39,7 +41,7 @@ class SQS {
   bool send_message(SendMessageInput* input);
   int get_message_count(std::string& qurl);
   bool purge_queue(std::string qurl);
-  std::optional<Message> receive(std::string qurl);
+  std::vector<Message> receive(std::string qurl, int count);
 };
 }  // namespace sqscpp
 

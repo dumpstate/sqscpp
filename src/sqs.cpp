@@ -2,6 +2,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <ctime>
 
 namespace sqscpp {
 SQS::SQS(std::string ep) {
@@ -97,6 +98,7 @@ bool SQS::send_message(SendMessageInput* msg) {
   m.message_id = boost::lexical_cast<std::string>(id);
   m.body = msg->get_message_body();
   m.md5_of_body = "md5";
+  m.visible_at = 0;
   queue->second.push_back(m);
   return true;
 }
@@ -120,14 +122,23 @@ bool SQS::purge_queue(std::string qurl) {
   return true;
 }
 
-std::optional<Message> SQS::receive(std::string qurl) {
+std::vector<Message> SQS::receive(std::string qurl, int count) {
   auto queue = queues.find(qurl);
   if (queue == queues.end() || queue->second.empty()) {
     return {};
   }
 
-  auto msg = queue->second.front();
-  queue->second.pop_front();
-  return msg;
+  std::vector<Message> messages;
+  auto total = 0;
+  auto ts = now();
+
+  while (!queue->second.empty() && queue->second.front().visible_at <= ts) {
+    queue->second.front().visible_at = ts + 30;
+    messages.push_back(queue->second.front());
+  }
+
+  return messages;
 }
+
+long SQS::now() { return std::time(nullptr); }
 }  // namespace sqscpp

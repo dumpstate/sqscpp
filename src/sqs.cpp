@@ -1,16 +1,19 @@
 #include "sqs.hpp"
 
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
 namespace sqscpp {
 SQS::SQS(std::string ep) {
   endpoint = ep;
-  queues = std::map<std::string, std::vector<std::string>>();
+  queues = std::map<std::string, std::deque<Message>>();
   queue_attrs = std::map<std::string, std::map<std::string, std::string>>();
 }
 
 std::string SQS::create_queue(CreateQueueInput* input) {
   std::string qurl = new_queue_url(input->get_queue_name());
   std::map<std::string, std::string> attrs = input->get_attrs();
-  queues[qurl] = std::vector<std::string>();
+  queues[qurl] = std::deque<Message>();
   queue_attrs[qurl] = attrs;
   return qurl;
 }
@@ -89,7 +92,12 @@ bool SQS::send_message(SendMessageInput* msg) {
     return false;
   }
 
-  queue->second.push_back(msg->get_message_body());
+  Message m;
+  auto id = uuid_generator();
+  m.message_id = boost::lexical_cast<std::string>(id);
+  m.body = msg->get_message_body();
+  m.md5_of_body = "md5";
+  queue->second.push_back(m);
   return true;
 }
 
@@ -110,5 +118,16 @@ bool SQS::purge_queue(std::string qurl) {
 
   queue->second.clear();
   return true;
+}
+
+std::optional<Message> SQS::receive(std::string qurl) {
+  auto queue = queues.find(qurl);
+  if (queue == queues.end() || queue->second.empty()) {
+    return {};
+  }
+
+  auto msg = queue->second.front();
+  queue->second.pop_front();
+  return msg;
 }
 }  // namespace sqscpp

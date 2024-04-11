@@ -40,6 +40,15 @@ std::optional<long> JsonSerde::parse_long(json j) {
   }
 }
 
+std::optional<int> JsonSerde::parse_int(json j) {
+  if (j == nullptr || !j.is_number_integer()) return {};
+  try {
+    return j;
+  } catch (json::type_error& e) {
+    return {};
+  }
+}
+
 std::string JsonSerde::serialize(Error* err) {
   json j;
   j["Message"] = err->message;
@@ -71,6 +80,15 @@ std::string JsonSerde::serialize(GetQueueUrlResponse* res) {
 std::string JsonSerde::serialize(ListQueueTagsResponse* res) {
   json j;
   j["Tags"] = *(res->tags);
+  return j.dump();
+}
+
+std::string JsonSerde::serialize(ReceivedMessageResponse* res) {
+  json j;
+  j["MessageId"] = res->message_id;
+  j["ReceiptHandle"] = res->receipt_handle;
+  j["MD5OfBody"] = res->md5_of_body;
+  j["Body"] = res->body;
   return j.dump();
 }
 
@@ -198,6 +216,23 @@ JsonSerde::deserialize_purge_queue_input(std::string str) {
   }
 }
 
+std::optional<std::unique_ptr<ReceiveMessageInput>>
+JsonSerde::deserialize_receive_message_input(std::string str) {
+  try {
+    json j = json::parse(str);
+
+    auto qurl = parse_non_empty_string(j["QueueUrl"]);
+    if (!qurl.has_value()) return {};
+
+    return std::make_unique<ReceiveMessageInput>(
+        qurl.value(), parse_int(j["MaxNumberOfMessages"]),
+        parse_non_empty_string(j["ReceiveRequestAttemptId"]),
+        parse_int(j["VisibilityTimeout"]), parse_long(j["WaitTimeSeconds"]));
+  } catch (json::parse_error& e) {
+    return {};
+  }
+}
+
 std::string HtmlSerde::render_html(std::string& body) {
   std::stringstream ss;
   ss << "<!DOCTYPE html>";
@@ -258,4 +293,7 @@ std::string HtmlSerde::serialize(ListQueueTagsResponse* res) {
   throw std::runtime_error("not implemented");
 }
 
+std::string HtmlSerde::serialize(ReceivedMessageResponse* res) {
+  throw std::runtime_error("not implemented");
+}
 }  // namespace sqscpp

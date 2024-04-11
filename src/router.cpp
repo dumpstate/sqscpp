@@ -138,6 +138,24 @@ restinio::request_handling_status_t sqs_query_handler(
       }
       return resp_ok(serde, req, "{}");
     }
+    case SQSReceiveMessage: {
+      auto body = serde->deserialize_receive_message_input(req->body());
+      if (!body.has_value()) {
+        return resp_err(serde, req, BadRequestError("invalid request body"));
+      }
+      auto msg = sqs->receive(body.value().get()->get_queue_url());
+      if (!msg.has_value()) {
+        return resp_err(serde, req,
+                        BadRequestError("Failed to receive message."));
+      }
+      auto res = ReceivedMessageResponse{
+          msg.value().message_id,
+          "",
+          msg.value().md5_of_body,
+          msg.value().body,
+      };
+      return resp_ok(serde, req, serde->serialize(&res));
+    }
     default:
       return resp_err(
           serde, req,

@@ -174,3 +174,27 @@ TEST(json_serde_test, purge_queue_input_from_str) {
   EXPECT_EQ(res.has_value(), true);
   EXPECT_EQ(res.value()->get_queue_url(), "test-url");
 }
+
+TEST(json_serde_test, receive_message_input_from_str) {
+  JsonSerde serde;
+  auto res = serde.deserialize_receive_message_input(
+      "{\"QueueUrl\":\"test-url\",\"MaxNumberOfMessages\":1}");
+
+  EXPECT_EQ(res.has_value(), true);
+  EXPECT_EQ(res.value()->get_queue_url(), "test-url");
+  EXPECT_EQ(res.value()->get_max_number_of_messages(), 1);
+}
+
+TEST(json_serde_test, received_message_response_to_str) {
+  JsonSerde serde;
+  ReceivedMessageResponse res;
+  res.message_id = "test-id";
+  res.body = "test-body";
+  res.md5_of_body = "test-md5";
+  res.receipt_handle = "test-handle";
+  auto str = serde.serialize(&res);
+
+  EXPECT_EQ(str,
+            "{\"Body\":\"test-body\",\"MD5OfBody\":\"test-md5\","
+            "\"MessageId\":\"test-id\",\"ReceiptHandle\":\"test-handle\"}");
+}

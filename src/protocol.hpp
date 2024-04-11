@@ -111,6 +111,36 @@ class SendMessageInput {
   }
 };
 
+class ReceiveMessageInput {
+ private:
+  std::string queue_url;
+  std::optional<int> max_number_of_messages;
+  std::optional<std::string> receive_request_attempt_id;
+  std::optional<int> visibility_timeout;
+  std::optional<long> wait_time_seconds;
+
+ public:
+  ReceiveMessageInput(std::string _queue_url,
+                      std::optional<int> _max_number_of_messages,
+                      std::optional<std::string> _receive_request_attempt_id,
+                      std::optional<int> _visibility_timeout,
+                      std::optional<long> _wait_time_seconds)
+      : queue_url(_queue_url),
+        max_number_of_messages(_max_number_of_messages),
+        receive_request_attempt_id(_receive_request_attempt_id),
+        visibility_timeout(_visibility_timeout),
+        wait_time_seconds(_wait_time_seconds) {}
+  std::string &get_queue_url() { return queue_url; }
+  std::optional<int> &get_max_number_of_messages() {
+    return max_number_of_messages;
+  }
+  std::optional<std::string> &get_receive_request_attempt_id() {
+    return receive_request_attempt_id;
+  }
+  std::optional<int> &get_visibility_timeout() { return visibility_timeout; }
+  std::optional<long> &get_wait_time_seconds() { return wait_time_seconds; }
+};
+
 struct BadRequestError : Error {
   BadRequestError(std::string msg) {
     status = restinio::status_bad_request();
@@ -137,6 +167,13 @@ struct GetQueueUrlResponse {
 
 struct ListQueueTagsResponse {
   std::map<std::string, std::string> *tags;
+};
+
+struct ReceivedMessageResponse {
+  std::string message_id;
+  std::string receipt_handle;
+  std::string md5_of_body;
+  std::string body;
 };
 
 }  // namespace sqscpp

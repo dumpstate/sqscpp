@@ -1,6 +1,8 @@
 #ifndef SQSCPP_SQS_H
 #define SQSCPP_SQS_H
 
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 #include <map>
 #include <string>
 #include <vector>
@@ -8,10 +10,17 @@
 #include "protocol.hpp"
 
 namespace sqscpp {
+struct Message {
+  std::string message_id;
+  std::string md5_of_body;
+  std::string body;
+};
+
 class SQS {
  private:
+  boost::uuids::random_generator uuid_generator;
   std::string endpoint;
-  std::map<std::string, std::vector<std::string>> queues;
+  std::map<std::string, std::deque<Message>> queues;
   std::map<std::string, std::map<std::string, std::string>> queue_attrs;
   std::map<std::string, std::map<std::string, std::string>> queue_tags;
 
@@ -30,6 +39,7 @@ class SQS {
   bool send_message(SendMessageInput* input);
   int get_message_count(std::string& qurl);
   bool purge_queue(std::string qurl);
+  std::optional<Message> receive(std::string qurl);
 };
 }  // namespace sqscpp
 

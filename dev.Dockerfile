@@ -9,3 +9,4 @@ RUN /opt/vcpkg/bootstrap-vcpkg.sh
 RUN /opt/vcpkg/vcpkg install restinio
 RUN /opt/vcpkg/vcpkg install nlohmann-json
 RUN /opt/vcpkg/vcpkg install boost-program-options
+RUN /opt/vcpkg/vcpkg install boost-uuid

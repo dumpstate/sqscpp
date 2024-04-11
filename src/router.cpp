@@ -44,7 +44,12 @@ restinio::request_handling_status_t sqs_query_handler(
     }
     case SQSListQueues: {
       auto qurls = sqs->get_queue_urls();
-      auto res = ListQueuesResponse{qurls.get()};
+      std::vector<QueueInfo> queues;
+      for (auto& qurl : *qurls) {
+        auto count = sqs->get_message_count(qurl);
+        queues.push_back(QueueInfo{qurl, count});
+      }
+      auto res = ListQueuesResponse{&queues};
       return resp_ok(serde, req, serde->serialize(&res));
     }
     case SQSDeleteQueue: {

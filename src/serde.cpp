@@ -54,7 +54,11 @@ std::string JsonSerde::serialize(CreateQueueResponse* res) {
 
 std::string JsonSerde::serialize(ListQueuesResponse* res) {
   json j;
-  j["QueueUrls"] = *(res->queue_urls);
+  std::vector<std::string> urls;
+  for (const auto& info : *(res->queue_urls)) {
+    urls.push_back(info.queue_url);
+  }
+  j["QueueUrls"] = urls;
   return j.dump();
 }
 
@@ -219,10 +223,10 @@ std::string HtmlSerde::serialize(ListQueuesResponse* res) {
     ss << "</tr>";
     ss << "</thead>";
     ss << "<tbody>";
-    for (const auto& url : *(res->queue_urls)) {
+    for (const auto& info : *(res->queue_urls)) {
       ss << "<tr>";
-      ss << "<td>" << url << "</td>";
-      ss << "<td>" << res->message_count << "</td>";
+      ss << "<td>" << info.queue_url << "</td>";
+      ss << "<td>" << info.message_count << "</td>";
       ss << "</tr>";
     }
     ss << "</tbody>";

@@ -152,9 +152,16 @@ std::vector<Message> SQS::receive(std::string qurl, int count) {
   auto total = 0;
   auto ts = now();
 
-  while (!queue->second.empty() && queue->second.front().visible_at <= ts) {
-    queue->second.front().visible_at = ts + 30;
-    messages.push_back(queue->second.front());
+  for (Message& msg : queue->second) {
+    if (msg.visible_at <= ts) {
+      msg.visible_at = ts + 30;
+      messages.push_back(msg);
+      total++;
+    }
+
+    if (total == count) {
+      break;
+    }
   }
   mtx.unlock();
   return messages;

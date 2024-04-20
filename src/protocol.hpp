@@ -197,6 +197,8 @@ struct FullQueueDataResponse {
   std::string queue_url;
   std::string queue_name;
   std::vector<ReceivedMessageResponse> messages;
+  std::map<std::string, std::string> tags;
+  std::map<std::string, std::string> attributes;
 };
 
 }  // namespace sqscpp

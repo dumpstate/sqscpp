@@ -30,6 +30,7 @@ def parse_args():
             "purge-queue",
             "receive-message",
             "delete-message",
+            "test-seed",
         ],
     )
     parser.add_argument(
@@ -97,7 +98,12 @@ def call_sqs(url: str, action: str, body: Any):
 
 
 def create_queue(url: str, name: str):
-    return call_sqs(url, "CreateQueue", {"QueueName": name})
+    return call_sqs(url, "CreateQueue", {
+        "QueueName": name,
+        "Attributes": {
+            "source": "cli.py",
+        },
+    })
 
 
 def delete_queue(url: str, qurl: str):
@@ -160,6 +166,16 @@ def delete_message(url: str, qurl: str, receipt_handle: str):
     })
 
 
+def test_seed(args: Namespace):
+    url = base_url(args)
+    qnames = [f"test-queue-{ix}" for ix in range(5)]
+
+    for qname in qnames:
+        create_queue(url, qname)
+        tag_queue(url, get_queue_url(url, qname), {"key": "value"})
+        send_message(url, get_queue_url(url, qname), {"message": "body"})
+
+
 def smoke_test(args: Namespace):
     url = base_url(args)
     qnames = [f"test-{uuid4()}" for _ in range(4)]
@@ -213,6 +229,8 @@ def main():
 
     if args.command == "smoke-test":
         smoke_test(args)
+    elif args.command == "test-seed":
+        test_seed(args)
     elif args.command == "create-queue":
         if not args.queue_name:
             raise ValueError("Queue name is required")

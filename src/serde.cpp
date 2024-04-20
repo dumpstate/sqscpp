@@ -338,14 +338,20 @@ std::string HtmlSerde::serialize(FullQueueDataResponse* res) {
   ss << "<h1 class=\"title is-4\">Attributes</h1>";
   ss << "<table class=\"table is-fullwidth\">";
   ss << "<tbody>";
-  ss << "<tr>";
-  ss << "<td>Queue Name</td>";
-  ss << "<td>" << res->queue_name << "</td>";
-  ss << "</tr>";
-  ss << "<tr>";
-  ss << "<td>Queue URL</td>";
-  ss << "<td>" << res->queue_url << "</td>";
-  ss << "</tr>";
+  ss << "<tr><td>Queue Name</td><td>" << res->queue_name << "</td></tr>";
+  ss << "<tr><td>Queue URL</td><td>" << res->queue_url << "</td></tr>";
+  ss << "<tr><td>Message Count</td><td>" << res->messages.size()
+     << "</td></tr>";
+  for (const auto& [key, value] : res->attributes) {
+    ss << "<tr><td>" << key << "</td><td>" << value << "</td></tr>";
+  }
+  if (!res->tags.empty()) {
+    ss << "<tr><td>Tags</td><td>";
+    for (const auto& [key, value] : res->tags) {
+      ss << "<span class=\"tag\">" << key << ":" << value << "</span>";
+    }
+    ss << "</td></tr>";
+  }
   ss << "</tbody>";
   ss << "</table>";
   ss << "<h1 class=\"title is-4\">Messages</h1>";

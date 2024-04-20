@@ -210,6 +210,8 @@ std::unique_ptr<FullQueueDataResponse> SQS::get_queue_data(std::string qname) {
     res_msg.body = msg.body;
     info.messages.push_back(res_msg);
   }
+  info.tags = queue_tags[qurl];
+  info.attributes = queue_attrs[qurl];
   return std::make_unique<FullQueueDataResponse>(info);
 }
 

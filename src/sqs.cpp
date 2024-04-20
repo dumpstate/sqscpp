@@ -167,5 +167,25 @@ std::vector<Message> SQS::receive(std::string qurl, int count) {
   return messages;
 }
 
+bool SQS::delete_message(DeleteMessageInput* input) {
+  mtx.lock();
+  auto queue = queues.find(input->get_queue_url());
+  if (queue == queues.end()) {
+    mtx.unlock();
+    return false;
+  }
+
+  auto& msgs = queue->second;
+  for (auto it = msgs.begin(); it != msgs.end(); it++) {
+    if (it->message_id == input->get_receipt_handle()) {
+      msgs.erase(it);
+      mtx.unlock();
+      return true;
+    }
+  }
+  mtx.unlock();
+  return false;
+}
+
 long SQS::now() { return std::time(nullptr); }
 }  // namespace sqscpp

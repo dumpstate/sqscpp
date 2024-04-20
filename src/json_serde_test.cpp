@@ -49,7 +49,8 @@ TEST(json_serde_test, parse_non_empty_string_empty) {
 
 TEST(json_serde_test, create_queue_input_from_str) {
   JsonSerde serde;
-  std::string input = "{\"QueueName\":\"test-queue\",\"Attributes\":{\"DelaySeconds\":\"5\"}}";
+  std::string input =
+      "{\"QueueName\":\"test-queue\",\"Attributes\":{\"DelaySeconds\":\"5\"}}";
   auto res = serde.deserialize_create_queue_input(input);
 
   EXPECT_EQ(res.has_value(), true);

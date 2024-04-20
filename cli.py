@@ -29,6 +29,7 @@ def parse_args():
             "send-message",
             "purge-queue",
             "receive-message",
+            "delete-message",
         ],
     )
     parser.add_argument(
@@ -68,6 +69,11 @@ def parse_args():
     parser.add_argument(
         "--tag",
         help="Tag",
+        type=str,
+    )
+    parser.add_argument(
+        "--receipt-handle",
+        help="Receipt handle",
         type=str,
     )
 
@@ -147,6 +153,13 @@ def receive_message(url: str, qurl: str):
     return res
 
 
+def delete_message(url: str, qurl: str, receipt_handle: str):
+    return call_sqs(url, "DeleteMessage", {
+        "QueueUrl": qurl,
+        "ReceiptHandle": receipt_handle,
+    })
+
+
 def smoke_test(args: Namespace):
     url = base_url(args)
     qnames = [f"test-{uuid4()}" for _ in range(4)]
@@ -169,6 +182,15 @@ def smoke_test(args: Namespace):
     for qname in qnames:
         print(f"Purging {qname}")
         purge_queue(url, get_queue_url(url, qname))
+
+    for qname in qnames:
+        print(f"Sending message to {qname}")
+        send_message(url, get_queue_url(url, qname), {"key": "value"})
+        print(f"Receiving message from {qname}")
+        res = receive_message(url, get_queue_url(url, qname))
+        receipt_handle = res.json()["Messages"][0]["ReceiptHandle"]
+        print(f"Deleting message from {qname}")
+        delete_message(url, get_queue_url(url, qname), receipt_handle)
 
     for qname in qnames:
         print(f"Deleting queue {qname}")
@@ -233,6 +255,12 @@ def main():
         if not args.queue_url:
             raise ValueError("Queue URL is required")
         receive_message(base_url(args), args.queue_url)
+    elif args.command == "delete-message":
+        if not args.queue_url:
+            raise ValueError("Queue URL is required")
+        if not args.receipt_handle:
+            raise ValueError("Receipt handle is required")
+        delete_message(base_url(args), args.queue_url, args.receipt_handle)
 
 
 if __name__ == "__main__":

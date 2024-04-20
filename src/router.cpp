@@ -163,6 +163,18 @@ restinio::request_handling_status_t sqs_query_handler(
       auto res = ReceivedMessagesResponse{res_msgs};
       return resp_ok(serde, req, serde->serialize(&res));
     }
+    case SQSDeleteMessage: {
+      auto input = req->body();
+      auto body = serde->deserialize_delete_message_input(input);
+      if (!body.has_value()) {
+        return resp_err(serde, req, BadRequestError("invalid request body"));
+      }
+      if (!sqs->delete_message(body.value().get())) {
+        return resp_err(serde, req,
+                        BadRequestError("The specified queue does not exist."));
+      }
+      return resp_ok(serde, req, "{}");
+    }
     default:
       return resp_err(
           serde, req,

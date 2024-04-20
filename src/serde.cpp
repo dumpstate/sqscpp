@@ -107,6 +107,13 @@ std::string JsonSerde::serialize(ReceivedMessagesResponse* res) {
   return j.dump();
 }
 
+std::string JsonSerde::serialize(SendMessageResponse* res) {
+  json j;
+  j["MessageId"] = res->message_id;
+  j["MD5OfMessageBody"] = res->md5_of_message_body;
+  return j.dump();
+}
+
 std::optional<std::unique_ptr<CreateQueueInput>>
 JsonSerde::deserialize_create_queue_input(std::string& str) {
   try {

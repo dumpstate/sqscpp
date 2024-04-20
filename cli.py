@@ -143,10 +143,12 @@ def untag_queue(url: str, qurl: str, tag_keys: list[str]):
 
 
 def send_message(url: str, qurl: str, message: dict):
-    return call_sqs(url, "SendMessage", {
+    res = call_sqs(url, "SendMessage", {
         "QueueUrl": qurl,
         "MessageBody": json.dumps(message),
     })
+    print(res.json())
+    return res
 
 
 def purge_queue(url: str, qurl: str):

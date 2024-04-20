@@ -27,6 +27,7 @@ class SQS {
   std::map<std::string, std::map<std::string, std::string>> queue_tags;
 
   std::string new_queue_url(std::string qname);
+  std::string md5(std::string& data);
   long now();
   std::mutex mtx;
 
@@ -40,7 +41,7 @@ class SQS {
   std::optional<std::unique_ptr<std::map<std::string, std::string>>>
   get_queue_tags(std::string qurl);
   bool untag_queue(std::string qurl, std::vector<std::string>* tag_keys);
-  bool send_message(SendMessageInput* input);
+  std::unique_ptr<SendMessageResponse> send_message(SendMessageInput* input);
   int get_message_count(std::string& qurl);
   bool purge_queue(std::string qurl);
   std::vector<Message> receive(std::string qurl, int count);

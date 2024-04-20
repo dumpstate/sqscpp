@@ -128,11 +128,12 @@ restinio::request_handling_status_t sqs_query_handler(
       if (!body.has_value()) {
         return resp_err(serde, req, BadRequestError("invalid request body"));
       }
-      if (!sqs->send_message(body.value().get())) {
+      auto res = sqs->send_message(body.value().get());
+      if (res == nullptr) {
         return resp_err(serde, req,
                         BadRequestError("The specified queue does not exist."));
       }
-      return resp_ok(serde, req, "{}");
+      return resp_ok(serde, req, serde->serialize(res.get()));
     }
     case SQSPurgeQueue: {
       auto input = req->body();
@@ -240,7 +241,6 @@ restinio::request_handling_status_t html_query_handler(
         headers->set_field(AWS_TARGET, "AmazonSQS.ListQueues");
       } else {
         headers->set_field(AWS_TARGET, "FullQueueData");
-        std::cout << "setting queue name: " << ss.str() << "\n";
         headers->set_field(QUEUE_NAME, ss.str());
       }
     }

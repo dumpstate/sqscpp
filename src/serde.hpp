@@ -19,6 +19,7 @@ class Serde {
   virtual std::string serialize(ListQueueTagsResponse *res) = 0;
   virtual std::string serialize(ReceivedMessageResponse *res) = 0;
   virtual std::string serialize(ReceivedMessagesResponse *res) = 0;
+  virtual std::string serialize(SendMessageResponse *res) = 0;
   virtual std::string serialize(FullQueueDataResponse *res) = 0;
 
   virtual std::optional<std::unique_ptr<CreateQueueInput>>
@@ -60,6 +61,7 @@ class JsonSerde : public Serde {
   std::string serialize(ListQueueTagsResponse *res) override;
   std::string serialize(ReceivedMessageResponse *res) override;
   std::string serialize(ReceivedMessagesResponse *res) override;
+  std::string serialize(SendMessageResponse *res) override;
   std::string serialize(FullQueueDataResponse *res) override {
     throw std::runtime_error("not implemented");
   }
@@ -99,6 +101,9 @@ class HtmlSerde : public Serde {
   std::string serialize(GetQueueUrlResponse *res) override;
   std::string serialize(ListQueueTagsResponse *res) override;
   std::string serialize(ReceivedMessageResponse *res) override;
+  std::string serialize(SendMessageResponse *res) override {
+    throw std::runtime_error("not implemented");
+  };
   std::string serialize(ReceivedMessagesResponse *res) override {
     throw std::runtime_error("not implemented");
   };

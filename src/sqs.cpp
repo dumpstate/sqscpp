@@ -1,7 +1,10 @@
 #include "sqs.hpp"
 
+#include <openssl/evp.h>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <cstdio>
 #include <ctime>
 
 namespace sqscpp {
@@ -104,23 +107,23 @@ bool SQS::untag_queue(std::string qurl, std::vector<std::string>* tag_keys) {
   return true;
 }
 
-bool SQS::send_message(SendMessageInput* msg) {
+std::unique_ptr<SendMessageResponse> SQS::send_message(SendMessageInput* msg) {
   mtx.lock();
   auto queue = queues.find(msg->get_queue_url());
   if (queue == queues.end()) {
     mtx.unlock();
-    return false;
+    return nullptr;
   }
 
   Message m;
   auto id = uuid_generator();
   m.message_id = boost::lexical_cast<std::string>(id);
   m.body = msg->get_message_body();
-  m.md5_of_body = "md5";
+  m.md5_of_body = md5(m.body);
   m.visible_at = 0;
   queue->second.push_back(m);
   mtx.unlock();
-  return true;
+  return std::make_unique<SendMessageResponse>(m.message_id, m.md5_of_body);
 }
 
 int SQS::get_message_count(std::string& qurl) {
@@ -216,4 +219,23 @@ std::unique_ptr<FullQueueDataResponse> SQS::get_queue_data(std::string qname) {
 }
 
 long SQS::now() { return std::time(nullptr); }
+
+std::string SQS::md5(std::string& content) {
+  // copied over from stack overflow
+  EVP_MD_CTX* context = EVP_MD_CTX_new();
+  const EVP_MD* md = EVP_md5();
+  unsigned char md_value[EVP_MAX_MD_SIZE];
+  unsigned int md_len;
+  std::string output;
+
+  EVP_DigestInit_ex2(context, md, NULL);
+  EVP_DigestUpdate(context, content.c_str(), content.length());
+  EVP_DigestFinal_ex(context, md_value, &md_len);
+  EVP_MD_CTX_free(context);
+
+  output.resize(md_len * 2);
+  for (unsigned int i = 0; i < md_len; ++i)
+    std::sprintf(&output[i * 2], "%02x", md_value[i]);
+  return output;
+}
 }  // namespace sqscpp

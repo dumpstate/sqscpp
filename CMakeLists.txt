@@ -16,6 +16,7 @@ FetchContent_MakeAvailable(googletest)
 find_package(restinio REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Boost 1.84.0 COMPONENTS program_options)
+find_package(OpenSSL REQUIRED)
 
 set(SOURCES src/cli_args.hpp src/cli_args.cpp src/router.hpp src/router.cpp src/protocol.hpp src/serde.hpp src/serde.cpp src/sqs.hpp src/sqs.cpp)
 add_executable(sqscpp src/main.cpp ${SOURCES})
@@ -23,6 +24,7 @@ target_include_directories(sqscpp PRIVATE src)
 target_link_libraries(sqscpp PRIVATE restinio::restinio)
 target_link_libraries(sqscpp PRIVATE Boost::program_options)
 target_link_libraries(sqscpp PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(sqscpp PRIVATE OpenSSL::SSL)
 
 # registering unit tests
 enable_testing()

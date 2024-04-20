@@ -11,12 +11,15 @@ const client = new SQSClient({
 const SQS_QUEUE_URL = "http://0.0.0.0:8080/000000000000/foo"
 
 async function main() {
-  const command = new SendMessageCommand({
-    QueueUrl: SQS_QUEUE_URL,
-    MessageBody: "Hello, World!",
-  })
-  const response = await client.send(command)
-  console.log(response)
+    const n = parseInt(process.argv[2]) || 1;
+    for (let i = 0; i < n; i++) {
+        const command = new SendMessageCommand({
+            QueueUrl: SQS_QUEUE_URL,
+            MessageBody: `Hello, World! ${i + 1} / ${n}`,
+        })
+        const response = await client.send(command)
+        console.log(response)
+    }
 }
 
 main()

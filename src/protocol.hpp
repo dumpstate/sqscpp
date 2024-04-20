@@ -193,6 +193,11 @@ struct ReceivedMessagesResponse {
   std::vector<ReceivedMessageResponse> messages;
 };
 
+struct SendMessageResponse {
+  std::string message_id;
+  std::string md5_of_message_body;
+};
+
 struct FullQueueDataResponse {
   std::string queue_url;
   std::string queue_name;

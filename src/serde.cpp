@@ -232,7 +232,7 @@ JsonSerde::deserialize_purge_queue_input(std::string str) {
 }
 
 std::optional<std::unique_ptr<ReceiveMessageInput>>
-JsonSerde::deserialize_receive_message_input(std::string str) {
+JsonSerde::deserialize_receive_message_input(std::string& str) {
   try {
     json j = json::parse(str);
 
@@ -243,6 +243,24 @@ JsonSerde::deserialize_receive_message_input(std::string str) {
         qurl.value(), parse_int(j["MaxNumberOfMessages"]),
         parse_non_empty_string(j["ReceiveRequestAttemptId"]),
         parse_int(j["VisibilityTimeout"]), parse_long(j["WaitTimeSeconds"]));
+  } catch (json::parse_error& e) {
+    return {};
+  }
+}
+
+std::optional<std::unique_ptr<DeleteMessageInput>>
+JsonSerde::deserialize_delete_message_input(std::string& str) {
+  try {
+    json j = json::parse(str);
+
+    auto qurl = parse_non_empty_string(j["QueueUrl"]);
+    if (!qurl.has_value()) return {};
+
+    auto receipt_handle = parse_non_empty_string(j["ReceiptHandle"]);
+    if (!receipt_handle.has_value()) return {};
+
+    return std::make_unique<DeleteMessageInput>(qurl.value(),
+                                                receipt_handle.value());
   } catch (json::parse_error& e) {
     return {};
   }

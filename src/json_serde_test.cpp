@@ -177,8 +177,8 @@ TEST(json_serde_test, purge_queue_input_from_str) {
 
 TEST(json_serde_test, receive_message_input_from_str) {
   JsonSerde serde;
-  auto res = serde.deserialize_receive_message_input(
-      "{\"QueueUrl\":\"test-url\",\"MaxNumberOfMessages\":1}");
+  std::string input = "{\"QueueUrl\":\"test-url\",\"MaxNumberOfMessages\":1}";
+  auto res = serde.deserialize_receive_message_input(input);
 
   EXPECT_EQ(res.has_value(), true);
   EXPECT_EQ(res.value()->get_queue_url(), "test-url");
@@ -197,4 +197,15 @@ TEST(json_serde_test, received_message_response_to_str) {
   EXPECT_EQ(str,
             "{\"Body\":\"test-body\",\"MD5OfBody\":\"test-md5\","
             "\"MessageId\":\"test-id\",\"ReceiptHandle\":\"test-handle\"}");
+}
+
+TEST(json_serde_test, delete_message_input_from_str) {
+  JsonSerde serde;
+  std::string input =
+      "{\"QueueUrl\":\"test-url\",\"ReceiptHandle\":\"test-handle\"}";
+  auto res = serde.deserialize_delete_message_input(input);
+
+  EXPECT_EQ(res.has_value(), true);
+  EXPECT_EQ(res.value()->get_queue_url(), "test-url");
+  EXPECT_EQ(res.value()->get_receipt_handle(), "test-handle");
 }

@@ -141,6 +141,18 @@ class ReceiveMessageInput {
   std::optional<long> &get_wait_time_seconds() { return wait_time_seconds; }
 };
 
+class DeleteMessageInput {
+ private:
+  std::string queue_url;
+  std::string receipt_handle;
+
+ public:
+  DeleteMessageInput(std::string &qurl, std::string &rh)
+      : queue_url(qurl), receipt_handle(rh) {}
+  std::string &get_queue_url() { return queue_url; }
+  std::string &get_receipt_handle() { return receipt_handle; }
+};
+
 struct BadRequestError : Error {
   BadRequestError(std::string msg) {
     status = restinio::status_bad_request();

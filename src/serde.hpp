@@ -37,7 +37,9 @@ class Serde {
   virtual std::optional<std::unique_ptr<PurgeQueueInput>>
   deserialize_purge_queue_input(std::string str) = 0;
   virtual std::optional<std::unique_ptr<ReceiveMessageInput>>
-  deserialize_receive_message_input(std::string str) = 0;
+  deserialize_receive_message_input(std::string &str) = 0;
+  virtual std::optional<std::unique_ptr<DeleteMessageInput>>
+  deserialize_delete_message_input(std::string &str) = 0;
 };
 
 class JsonSerde : public Serde {
@@ -75,7 +77,9 @@ class JsonSerde : public Serde {
   std::optional<std::unique_ptr<PurgeQueueInput>> deserialize_purge_queue_input(
       std::string str) override;
   std::optional<std::unique_ptr<ReceiveMessageInput>>
-  deserialize_receive_message_input(std::string str) override;
+  deserialize_receive_message_input(std::string &str) override;
+  std::optional<std::unique_ptr<DeleteMessageInput>>
+  deserialize_delete_message_input(std::string &str) override;
 };
 
 class HtmlSerde : public Serde {
@@ -128,9 +132,13 @@ class HtmlSerde : public Serde {
     throw std::runtime_error("not implemented");
   }
   std::optional<std::unique_ptr<ReceiveMessageInput>>
-  deserialize_receive_message_input(std::string str) override {
+  deserialize_receive_message_input(std::string &str) override {
     throw std::runtime_error("not implemented");
   }
+  std::optional<std::unique_ptr<DeleteMessageInput>>
+  deserialize_delete_message_input(std::string &str) override {
+    throw std::runtime_error("not implemented");
+  };
 };
 }  // namespace sqscpp
 

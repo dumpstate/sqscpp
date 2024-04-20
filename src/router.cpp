@@ -139,7 +139,8 @@ restinio::request_handling_status_t sqs_query_handler(
       return resp_ok(serde, req, "{}");
     }
     case SQSReceiveMessage: {
-      auto body = serde->deserialize_receive_message_input(req->body());
+      auto input = req->body();
+      auto body = serde->deserialize_receive_message_input(input);
       if (!body.has_value()) {
         return resp_err(serde, req, BadRequestError("invalid request body"));
       }

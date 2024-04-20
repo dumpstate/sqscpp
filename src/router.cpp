@@ -175,6 +175,18 @@ restinio::request_handling_status_t sqs_query_handler(
       }
       return resp_ok(serde, req, "{}");
     }
+    case FullQueueData: {
+      auto qname = extract_queue_name(headers);
+      if (!qname.has_value()) {
+        return resp_err(serde, req, BadRequestError("queue name not found"));
+      }
+      auto res = sqs->get_queue_data(qname.value());
+      if (res == nullptr) {
+        return resp_err(serde, req,
+                        BadRequestError("The specified queue does not exist."));
+      }
+      return resp_ok(serde, req, serde->serialize(res.get()));
+    }
     default:
       return resp_err(
           serde, req,
@@ -193,6 +205,17 @@ restinio::request_handling_status_t html_query_handler(
         .done();
   } else if (path == "/queues") {
     headers->set_field(AWS_TARGET, "AmazonSQS.ListQueues");
+  } else if (path.find("/queues/") == 0) {
+    std::stringstream ss;
+    ss << path.substr(8);
+    auto qname = ss.str();
+    if (qname.size() == 0) {
+      headers->set_field(AWS_TARGET, "AmazonSQS.ListQueues");
+    } else {
+      headers->set_field(AWS_TARGET, "FullQueueData");
+      std::cout << "setting queue name: " << ss.str() << "\n";
+      headers->set_field(QUEUE_NAME, ss.str());
+    }
   }
   return sqs_query_handler(sqs, serde, headers, req);
 }
@@ -244,6 +267,15 @@ std::optional<SQSAction> extract_action(
     } catch (const std::out_of_range&) {
       return {};
     }
+  }
+  return {};
+}
+
+std::optional<std::string> extract_queue_name(
+    restinio::http_request_header_t* headers) {
+  auto qname = headers->opt_value_of(QUEUE_NAME);
+  if (qname.has_value()) {
+    return qname.value().data();
   }
   return {};
 }

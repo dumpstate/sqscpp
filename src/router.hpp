@@ -29,7 +29,9 @@ enum SQSAction {
   SQSSendMessageBatch,
   SQSSendMessage,
   SQSTagQueue,
-  SQSUntagQueue
+  SQSUntagQueue,
+  // off AWS SQS, for GUI
+  FullQueueData
 };
 
 const std::string AWS_JSON_PROTOCOL_1_0 = "application/x-amz-json-1.0";
@@ -37,6 +39,7 @@ const std::string AWS_QUERY_PROTOCOL = "text/xml";
 const std::string TEXT_HTML = "text/html";
 const std::string AWS_TRACE_ID = "x-amzn-trace-id";
 const std::string AWS_TARGET = "x-amz-target";
+const std::string QUEUE_NAME = "x-queue-name";
 const std::map<std::string, SQSAction> AWS_SQS_ACTIONS = {
     {"AmazonSQS.AddPermission", SQSAddPermission},
     {"AmazonSQS.ChangeMessageVisibilityBatch", SQSChangeMessageVisibilityBatch},
@@ -57,7 +60,8 @@ const std::map<std::string, SQSAction> AWS_SQS_ACTIONS = {
     {"AmazonSQS.SendMessageBatch", SQSSendMessageBatch},
     {"AmazonSQS.SendMessage", SQSSendMessage},
     {"AmazonSQS.TagQueue", SQSTagQueue},
-    {"AmazonSQS.UntagQueue", SQSUntagQueue}};
+    {"AmazonSQS.UntagQueue", SQSUntagQueue},
+    {"FullQueueData", FullQueueData}};
 
 std::function<restinio::request_handling_status_t(restinio::request_handle_t)>
 handler_factory(SQS* sqs, JsonSerde* serde, HtmlSerde* html_serde);
@@ -72,6 +76,8 @@ AWSProtocol extract_protocol(restinio::http_request_header_t* headers);
 std::optional<SQSAction> extract_action(
     restinio::http_request_header_t* headers);
 std::optional<std::string> extract_trace_id(
+    restinio::http_request_header_t* headers);
+std::optional<std::string> extract_queue_name(
     restinio::http_request_header_t* headers);
 
 restinio::request_handling_status_t resp_ok(Serde* serde,

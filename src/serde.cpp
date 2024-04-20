@@ -331,4 +331,41 @@ std::string HtmlSerde::serialize(ListQueueTagsResponse* res) {
 std::string HtmlSerde::serialize(ReceivedMessageResponse* res) {
   throw std::runtime_error("not implemented");
 }
+
+std::string HtmlSerde::serialize(FullQueueDataResponse* res) {
+  std::stringstream ss;
+  ss << "<h1 class=\"title\">Queue Details</h1>";
+  ss << "<h1 class=\"title is-4\">Attributes</h1>";
+  ss << "<table class=\"table is-fullwidth\">";
+  ss << "<tbody>";
+  ss << "<tr>";
+  ss << "<td>Queue Name</td>";
+  ss << "<td>" << res->queue_name << "</td>";
+  ss << "</tr>";
+  ss << "<tr>";
+  ss << "<td>Queue URL</td>";
+  ss << "<td>" << res->queue_url << "</td>";
+  ss << "</tr>";
+  ss << "</tbody>";
+  ss << "</table>";
+  ss << "<h1 class=\"title is-4\">Messages</h1>";
+  ss << "<table class=\"table is-fullwidth\">";
+  ss << "<thead>";
+  ss << "<tr>";
+  ss << "<th>Message ID</th>";
+  ss << "<th>Body</th>";
+  ss << "</tr>";
+  ss << "</thead>";
+  ss << "<tbody>";
+  for (const auto& msg : res->messages) {
+    ss << "<tr>";
+    ss << "<td>" << msg.message_id << "</td>";
+    ss << "<td><pre>" << msg.body << "</pre></td>";
+    ss << "</tr>";
+  }
+  ss << "</table>";
+
+  auto body = ss.str();
+  return render_html(body);
+}
 }  // namespace sqscpp

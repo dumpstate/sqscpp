@@ -193,6 +193,12 @@ struct ReceivedMessagesResponse {
   std::vector<ReceivedMessageResponse> messages;
 };
 
+struct FullQueueDataResponse {
+  std::string queue_url;
+  std::string queue_name;
+  std::vector<ReceivedMessageResponse> messages;
+};
+
 }  // namespace sqscpp
 
 #endif  // SQSCPP_PROTOCOL_H

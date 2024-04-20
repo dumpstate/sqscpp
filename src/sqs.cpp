@@ -192,5 +192,26 @@ bool SQS::delete_message(DeleteMessageInput* input) {
   return false;
 }
 
+std::unique_ptr<FullQueueDataResponse> SQS::get_queue_data(std::string qname) {
+  auto qurl = new_queue_url(qname);
+  auto queue = queues.find(qurl);
+  if (queue == queues.end()) {
+    return nullptr;
+  }
+
+  auto info = FullQueueDataResponse();
+  info.queue_name = qname;
+  info.queue_url = qurl;
+  for (const auto& msg : queue->second) {
+    ReceivedMessageResponse res_msg;
+    res_msg.message_id = msg.message_id;
+    res_msg.receipt_handle = msg.message_id;
+    res_msg.md5_of_body = msg.md5_of_body;
+    res_msg.body = msg.body;
+    info.messages.push_back(res_msg);
+  }
+  return std::make_unique<FullQueueDataResponse>(info);
+}
+
 long SQS::now() { return std::time(nullptr); }
 }  // namespace sqscpp

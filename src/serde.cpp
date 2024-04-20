@@ -335,6 +335,9 @@ std::string HtmlSerde::serialize(ReceivedMessageResponse* res) {
 std::string HtmlSerde::serialize(FullQueueDataResponse* res) {
   std::stringstream ss;
   ss << "<h1 class=\"title\">Queue Details</h1>";
+  ss << "<h1 class=\"title is-4\">Actions</h1>";
+  ss << "<a class=\"button is-danger\" href=\"/queues/" << res->queue_name
+     << "/purge\">Purge Queue</a>";
   ss << "<h1 class=\"title is-4\">Attributes</h1>";
   ss << "<table class=\"table is-fullwidth\">";
   ss << "<tbody>";

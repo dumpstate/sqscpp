@@ -31,7 +31,8 @@ enum SQSAction {
   SQSTagQueue,
   SQSUntagQueue,
   // off AWS SQS, for GUI
-  FullQueueData
+  FullQueueData,
+  PurgeQueue
 };
 
 const std::string AWS_JSON_PROTOCOL_1_0 = "application/x-amz-json-1.0";
@@ -61,7 +62,8 @@ const std::map<std::string, SQSAction> AWS_SQS_ACTIONS = {
     {"AmazonSQS.SendMessage", SQSSendMessage},
     {"AmazonSQS.TagQueue", SQSTagQueue},
     {"AmazonSQS.UntagQueue", SQSUntagQueue},
-    {"FullQueueData", FullQueueData}};
+    {"FullQueueData", FullQueueData},
+    {"PurgeQueue", PurgeQueue}};
 
 std::function<restinio::request_handling_status_t(restinio::request_handle_t)>
 handler_factory(SQS* sqs, JsonSerde* serde, HtmlSerde* html_serde);

@@ -187,6 +187,26 @@ restinio::request_handling_status_t sqs_query_handler(
       }
       return resp_ok(serde, req, serde->serialize(res.get()));
     }
+    case PurgeQueue: {
+      auto qname = extract_queue_name(headers);
+      if (!qname.has_value()) {
+        return resp_err(serde, req, BadRequestError("queue name not found"));
+      }
+      auto qurl = sqs->get_queue_url(qname.value());
+      if (!qurl.has_value()) {
+        return resp_err(serde, req,
+                        BadRequestError("The specified queue does not exist."));
+      }
+      if (!sqs->purge_queue(qurl.value())) {
+        return resp_err(serde, req,
+                        BadRequestError("The specified queue does not exist."));
+      }
+      return req->create_response(restinio::status_permanent_redirect())
+          .append_header(restinio::http_field::location,
+                         "/queues/" + qname.value())
+          .set_body("")
+          .done();
+    }
     default:
       return resp_err(
           serde, req,
@@ -206,15 +226,23 @@ restinio::request_handling_status_t html_query_handler(
   } else if (path == "/queues") {
     headers->set_field(AWS_TARGET, "AmazonSQS.ListQueues");
   } else if (path.find("/queues/") == 0) {
-    std::stringstream ss;
-    ss << path.substr(8);
-    auto qname = ss.str();
-    if (qname.size() == 0) {
-      headers->set_field(AWS_TARGET, "AmazonSQS.ListQueues");
+    if (path.find("/purge") != std::string::npos) {
+      headers->set_field(AWS_TARGET, "PurgeQueue");
+      std::stringstream ss;
+      ss << path.substr(8, path.size() - 14);
+      auto qname = ss.str();
+      headers->set_field(QUEUE_NAME, qname);
     } else {
-      headers->set_field(AWS_TARGET, "FullQueueData");
-      std::cout << "setting queue name: " << ss.str() << "\n";
-      headers->set_field(QUEUE_NAME, ss.str());
+      std::stringstream ss;
+      ss << path.substr(8);
+      auto qname = ss.str();
+      if (qname.size() == 0) {
+        headers->set_field(AWS_TARGET, "AmazonSQS.ListQueues");
+      } else {
+        headers->set_field(AWS_TARGET, "FullQueueData");
+        std::cout << "setting queue name: " << ss.str() << "\n";
+        headers->set_field(QUEUE_NAME, ss.str());
+      }
     }
   }
   return sqs_query_handler(sqs, serde, headers, req);

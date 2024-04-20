@@ -1,0 +1,14 @@
+{
+  "name": "sqscpp-test",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@aws-sdk/client-sqs": "^3.556.0"
+  }
+}

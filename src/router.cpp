@@ -34,7 +34,8 @@ restinio::request_handling_status_t sqs_query_handler(
 
   switch (action.value()) {
     case SQSCreateQueue: {
-      auto body = serde->deserialize_create_queue_input(req->body());
+      auto input = req->body();
+      auto body = serde->deserialize_create_queue_input(input);
       if (!body.has_value()) {
         return resp_err(serde, req, BadRequestError("invalid request body"));
       }
@@ -53,7 +54,8 @@ restinio::request_handling_status_t sqs_query_handler(
       return resp_ok(serde, req, serde->serialize(&res));
     }
     case SQSDeleteQueue: {
-      auto body = serde->deserialize_delete_queue_input(req->body());
+      auto input = req->body();
+      auto body = serde->deserialize_delete_queue_input(input);
       if (!body.has_value()) {
         return resp_err(serde, req, BadRequestError("invalid request body"));
       }
@@ -65,7 +67,8 @@ restinio::request_handling_status_t sqs_query_handler(
       return resp_ok(serde, req, "{}");
     }
     case SQSGetQueueUrl: {
-      auto body = serde->deserialize_get_queue_url_input(req->body());
+      auto input = req->body();
+      auto body = serde->deserialize_get_queue_url_input(input);
       if (!body.has_value()) {
         return resp_err(serde, req, BadRequestError("invalid request body"));
       }
@@ -78,7 +81,8 @@ restinio::request_handling_status_t sqs_query_handler(
       return resp_ok(serde, req, serde->serialize(&res));
     }
     case SQSTagQueue: {
-      auto body = serde->deserialize_tag_queue_input(req->body());
+      auto input = req->body();
+      auto body = serde->deserialize_tag_queue_input(input);
       if (!body.has_value()) {
         return resp_err(serde, req, BadRequestError("invalid request body"));
       }
@@ -91,7 +95,8 @@ restinio::request_handling_status_t sqs_query_handler(
       return resp_ok(serde, req, "{}");
     }
     case SQSListQueueTags: {
-      auto body = serde->deserialize_list_queue_tags_input(req->body());
+      auto input = req->body();
+      auto body = serde->deserialize_list_queue_tags_input(input);
       if (!body.has_value()) {
         return resp_err(serde, req, BadRequestError("invalid request body"));
       }
@@ -104,7 +109,8 @@ restinio::request_handling_status_t sqs_query_handler(
       return resp_ok(serde, req, serde->serialize(&res));
     }
     case SQSUntagQueue: {
-      auto body = serde->deserialize_untag_queue_input(req->body());
+      auto input = req->body();
+      auto body = serde->deserialize_untag_queue_input(input);
       if (!body.has_value()) {
         return resp_err(serde, req, BadRequestError("invalid request body"));
       }
@@ -117,7 +123,8 @@ restinio::request_handling_status_t sqs_query_handler(
       return resp_ok(serde, req, "{}");
     }
     case SQSSendMessage: {
-      auto body = serde->deserialize_send_message_input(req->body());
+      auto input = req->body();
+      auto body = serde->deserialize_send_message_input(input);
       if (!body.has_value()) {
         return resp_err(serde, req, BadRequestError("invalid request body"));
       }
@@ -128,7 +135,8 @@ restinio::request_handling_status_t sqs_query_handler(
       return resp_ok(serde, req, "{}");
     }
     case SQSPurgeQueue: {
-      auto body = serde->deserialize_purge_queue_input(req->body());
+      auto input = req->body();
+      auto body = serde->deserialize_purge_queue_input(input);
       if (!body.has_value()) {
         return resp_err(serde, req, BadRequestError("invalid request body"));
       }

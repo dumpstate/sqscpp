@@ -108,7 +108,7 @@ std::string JsonSerde::serialize(ReceivedMessagesResponse* res) {
 }
 
 std::optional<std::unique_ptr<CreateQueueInput>>
-JsonSerde::deserialize_create_queue_input(std::string str) {
+JsonSerde::deserialize_create_queue_input(std::string& str) {
   try {
     json j = json::parse(str);
 
@@ -123,7 +123,7 @@ JsonSerde::deserialize_create_queue_input(std::string str) {
 }
 
 std::optional<std::unique_ptr<GetQueueUrlInput>>
-JsonSerde::deserialize_get_queue_url_input(std::string str) {
+JsonSerde::deserialize_get_queue_url_input(std::string& str) {
   try {
     json j = json::parse(str);
 
@@ -137,7 +137,7 @@ JsonSerde::deserialize_get_queue_url_input(std::string str) {
 }
 
 std::optional<std::unique_ptr<DeleteQueueInput>>
-JsonSerde::deserialize_delete_queue_input(std::string str) {
+JsonSerde::deserialize_delete_queue_input(std::string& str) {
   try {
     json j = json::parse(str);
 
@@ -151,7 +151,7 @@ JsonSerde::deserialize_delete_queue_input(std::string str) {
 }
 
 std::optional<std::unique_ptr<TagQueueInput>>
-JsonSerde::deserialize_tag_queue_input(std::string str) {
+JsonSerde::deserialize_tag_queue_input(std::string& str) {
   try {
     json j = json::parse(str);
 
@@ -168,7 +168,7 @@ JsonSerde::deserialize_tag_queue_input(std::string str) {
 }
 
 std::optional<std::unique_ptr<ListQueueTagsInput>>
-JsonSerde::deserialize_list_queue_tags_input(std::string str) {
+JsonSerde::deserialize_list_queue_tags_input(std::string& str) {
   try {
     json j = json::parse(str);
 
@@ -182,7 +182,7 @@ JsonSerde::deserialize_list_queue_tags_input(std::string str) {
 }
 
 std::optional<std::unique_ptr<UntagQueueInput>>
-JsonSerde::deserialize_untag_queue_input(std::string str) {
+JsonSerde::deserialize_untag_queue_input(std::string& str) {
   try {
     json j = json::parse(str);
 
@@ -199,7 +199,7 @@ JsonSerde::deserialize_untag_queue_input(std::string str) {
 }
 
 std::optional<std::unique_ptr<SendMessageInput>>
-JsonSerde::deserialize_send_message_input(std::string str) {
+JsonSerde::deserialize_send_message_input(std::string& str) {
   try {
     json j = json::parse(str);
 
@@ -218,7 +218,7 @@ JsonSerde::deserialize_send_message_input(std::string str) {
 }
 
 std::optional<std::unique_ptr<PurgeQueueInput>>
-JsonSerde::deserialize_purge_queue_input(std::string str) {
+JsonSerde::deserialize_purge_queue_input(std::string& str) {
   try {
     json j = json::parse(str);
 

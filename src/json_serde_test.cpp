@@ -49,8 +49,8 @@ TEST(json_serde_test, parse_non_empty_string_empty) {
 
 TEST(json_serde_test, create_queue_input_from_str) {
   JsonSerde serde;
-  auto res = serde.deserialize_create_queue_input(
-      "{\"QueueName\":\"test-queue\",\"Attributes\":{\"DelaySeconds\":\"5\"}}");
+  std::string input = "{\"QueueName\":\"test-queue\",\"Attributes\":{\"DelaySeconds\":\"5\"}}";
+  auto res = serde.deserialize_create_queue_input(input);
 
   EXPECT_EQ(res.has_value(), true);
   EXPECT_EQ(res.value()->get_queue_name(), "test-queue");
@@ -59,8 +59,8 @@ TEST(json_serde_test, create_queue_input_from_str) {
 
 TEST(json_serde_test, create_queue_input_from_str_no_attrs) {
   JsonSerde serde;
-  auto res =
-      serde.deserialize_create_queue_input("{\"QueueName\":\"test-queue\"}");
+  std::string input = "{\"QueueName\":\"test-queue\"}";
+  auto res = serde.deserialize_create_queue_input(input);
 
   EXPECT_EQ(res.has_value(), true);
   EXPECT_EQ(res.value()->get_queue_name(), "test-queue");
@@ -69,15 +69,16 @@ TEST(json_serde_test, create_queue_input_from_str_no_attrs) {
 
 TEST(json_serde_test, create_queue_input_from_str_empty) {
   JsonSerde serde;
-  auto res = serde.deserialize_create_queue_input("{}");
+  std::string input = "{}";
+  auto res = serde.deserialize_create_queue_input(input);
 
   EXPECT_EQ(res.has_value(), false);
 }
 
 TEST(json_serde_test, create_queue_input_from_str_no_queue_name) {
   JsonSerde serde;
-  auto res = serde.deserialize_create_queue_input(
-      "{\"Attributes\":{\"DelaySeconds\":\"5\"}}");
+  std::string input = "{\"Attributes\":{\"DelaySeconds\":\"5\"}}";
+  auto res = serde.deserialize_create_queue_input(input);
 
   EXPECT_EQ(res.has_value(), false);
 }
@@ -103,8 +104,8 @@ TEST(json_serde_test, list_queues_response_to_str) {
 
 TEST(json_serde_test, delete_queue_input_from_str) {
   JsonSerde serde;
-  auto res =
-      serde.deserialize_delete_queue_input("{\"QueueUrl\":\"test-url\"}");
+  std::string input = "{\"QueueUrl\":\"test-url\"}";
+  auto res = serde.deserialize_delete_queue_input(input);
 
   EXPECT_EQ(res.has_value(), true);
   EXPECT_EQ(res.value()->get_queue_url(), "test-url");
@@ -112,8 +113,8 @@ TEST(json_serde_test, delete_queue_input_from_str) {
 
 TEST(json_serde_test, get_queue_url_from_str) {
   JsonSerde serde;
-  auto res =
-      serde.deserialize_get_queue_url_input("{\"QueueName\":\"test-queue\"}");
+  std::string input = "{\"QueueName\":\"test-queue\"}";
+  auto res = serde.deserialize_get_queue_url_input(input);
 
   EXPECT_EQ(res.has_value(), true);
   EXPECT_EQ(res.value()->get_queue_name(), "test-queue");
@@ -130,8 +131,9 @@ TEST(json_serde_test, get_queue_url_response_to_str) {
 
 TEST(json_serde_test, tag_queue_input_from_str) {
   JsonSerde serde;
-  auto res = serde.deserialize_tag_queue_input(
-      "{\"QueueUrl\":\"test-url\",\"Tags\":{\"key\":\"value\"}}");
+  std::string input =
+      "{\"QueueUrl\":\"test-url\",\"Tags\":{\"key\":\"value\"}}";
+  auto res = serde.deserialize_tag_queue_input(input);
 
   EXPECT_EQ(res.has_value(), true);
   EXPECT_EQ(res.value()->get_queue_url(), "test-url");
@@ -140,8 +142,8 @@ TEST(json_serde_test, tag_queue_input_from_str) {
 
 TEST(json_serde_test, list_queue_tags_input_from_str) {
   JsonSerde serde;
-  auto res =
-      serde.deserialize_list_queue_tags_input("{\"QueueUrl\":\"test-url\"}");
+  std::string input = "{\"QueueUrl\":\"test-url\"}";
+  auto res = serde.deserialize_list_queue_tags_input(input);
 
   EXPECT_EQ(res.has_value(), true);
   EXPECT_EQ(res.value()->get_queue_url(), "test-url");
@@ -159,8 +161,8 @@ TEST(json_serde_test, list_queue_tags_response_to_str) {
 
 TEST(json_serde_test, untag_queue_input_from_str) {
   JsonSerde serde;
-  auto res = serde.deserialize_untag_queue_input(
-      "{\"QueueUrl\":\"test-url\",\"TagKeys\":[\"key\"]}");
+  std::string input = "{\"QueueUrl\":\"test-url\",\"TagKeys\":[\"key\"]}";
+  auto res = serde.deserialize_untag_queue_input(input);
 
   EXPECT_EQ(res.has_value(), true);
   EXPECT_EQ(res.value()->get_queue_url(), "test-url");
@@ -169,7 +171,8 @@ TEST(json_serde_test, untag_queue_input_from_str) {
 
 TEST(json_serde_test, purge_queue_input_from_str) {
   JsonSerde serde;
-  auto res = serde.deserialize_purge_queue_input("{\"QueueUrl\":\"test-url\"}");
+  std::string input = "{\"QueueUrl\":\"test-url\"}";
+  auto res = serde.deserialize_purge_queue_input(input);
 
   EXPECT_EQ(res.has_value(), true);
   EXPECT_EQ(res.value()->get_queue_url(), "test-url");

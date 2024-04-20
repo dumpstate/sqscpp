@@ -21,21 +21,21 @@ class Serde {
   virtual std::string serialize(ReceivedMessagesResponse *res) = 0;
 
   virtual std::optional<std::unique_ptr<CreateQueueInput>>
-  deserialize_create_queue_input(std::string str) = 0;
+  deserialize_create_queue_input(std::string &str) = 0;
   virtual std::optional<std::unique_ptr<GetQueueUrlInput>>
-  deserialize_get_queue_url_input(std::string str) = 0;
+  deserialize_get_queue_url_input(std::string &str) = 0;
   virtual std::optional<std::unique_ptr<DeleteQueueInput>>
-  deserialize_delete_queue_input(std::string str) = 0;
+  deserialize_delete_queue_input(std::string &str) = 0;
   virtual std::optional<std::unique_ptr<TagQueueInput>>
-  deserialize_tag_queue_input(std::string str) = 0;
+  deserialize_tag_queue_input(std::string &str) = 0;
   virtual std::optional<std::unique_ptr<ListQueueTagsInput>>
-  deserialize_list_queue_tags_input(std::string str) = 0;
+  deserialize_list_queue_tags_input(std::string &str) = 0;
   virtual std::optional<std::unique_ptr<UntagQueueInput>>
-  deserialize_untag_queue_input(std::string str) = 0;
+  deserialize_untag_queue_input(std::string &str) = 0;
   virtual std::optional<std::unique_ptr<SendMessageInput>>
-  deserialize_send_message_input(std::string str) = 0;
+  deserialize_send_message_input(std::string &str) = 0;
   virtual std::optional<std::unique_ptr<PurgeQueueInput>>
-  deserialize_purge_queue_input(std::string str) = 0;
+  deserialize_purge_queue_input(std::string &str) = 0;
   virtual std::optional<std::unique_ptr<ReceiveMessageInput>>
   deserialize_receive_message_input(std::string &str) = 0;
   virtual std::optional<std::unique_ptr<DeleteMessageInput>>
@@ -61,21 +61,21 @@ class JsonSerde : public Serde {
   std::string serialize(ReceivedMessagesResponse *res) override;
 
   std::optional<std::unique_ptr<CreateQueueInput>>
-  deserialize_create_queue_input(std::string str) override;
+  deserialize_create_queue_input(std::string &str) override;
   std::optional<std::unique_ptr<GetQueueUrlInput>>
-  deserialize_get_queue_url_input(std::string str) override;
+  deserialize_get_queue_url_input(std::string &str) override;
   std::optional<std::unique_ptr<DeleteQueueInput>>
-  deserialize_delete_queue_input(std::string str) override;
+  deserialize_delete_queue_input(std::string &str) override;
   std::optional<std::unique_ptr<TagQueueInput>> deserialize_tag_queue_input(
-      std::string str) override;
+      std::string &str) override;
   std::optional<std::unique_ptr<ListQueueTagsInput>>
-  deserialize_list_queue_tags_input(std::string str) override;
+  deserialize_list_queue_tags_input(std::string &str) override;
   std::optional<std::unique_ptr<UntagQueueInput>> deserialize_untag_queue_input(
-      std::string str) override;
+      std::string &str) override;
   std::optional<std::unique_ptr<SendMessageInput>>
-  deserialize_send_message_input(std::string str) override;
+  deserialize_send_message_input(std::string &str) override;
   std::optional<std::unique_ptr<PurgeQueueInput>> deserialize_purge_queue_input(
-      std::string str) override;
+      std::string &str) override;
   std::optional<std::unique_ptr<ReceiveMessageInput>>
   deserialize_receive_message_input(std::string &str) override;
   std::optional<std::unique_ptr<DeleteMessageInput>>
@@ -100,35 +100,35 @@ class HtmlSerde : public Serde {
   };
 
   std::optional<std::unique_ptr<CreateQueueInput>>
-  deserialize_create_queue_input(std::string str) override {
+  deserialize_create_queue_input(std::string &str) override {
     throw std::runtime_error("not implemented");
   }
   std::optional<std::unique_ptr<GetQueueUrlInput>>
-  deserialize_get_queue_url_input(std::string str) override {
+  deserialize_get_queue_url_input(std::string &str) override {
     throw std::runtime_error("not implemented");
   }
   std::optional<std::unique_ptr<DeleteQueueInput>>
-  deserialize_delete_queue_input(std::string str) override {
+  deserialize_delete_queue_input(std::string &str) override {
     throw std::runtime_error("not implemented");
   }
   std::optional<std::unique_ptr<TagQueueInput>> deserialize_tag_queue_input(
-      std::string str) override {
+      std::string &str) override {
     throw std::runtime_error("not implemented");
   }
   std::optional<std::unique_ptr<ListQueueTagsInput>>
-  deserialize_list_queue_tags_input(std::string str) override {
+  deserialize_list_queue_tags_input(std::string &str) override {
     throw std::runtime_error("not implemented");
   }
   std::optional<std::unique_ptr<UntagQueueInput>> deserialize_untag_queue_input(
-      std::string str) override {
+      std::string &str) override {
     throw std::runtime_error("not implemented");
   }
   std::optional<std::unique_ptr<SendMessageInput>>
-  deserialize_send_message_input(std::string str) override {
+  deserialize_send_message_input(std::string &str) override {
     throw std::runtime_error("not implemented");
   }
   std::optional<std::unique_ptr<PurgeQueueInput>> deserialize_purge_queue_input(
-      std::string str) override {
+      std::string &str) override {
     throw std::runtime_error("not implemented");
   }
   std::optional<std::unique_ptr<ReceiveMessageInput>>

@@ -27,6 +27,11 @@ std::string SQS::new_queue_url(std::string qname) {
   return ss.str();
 }
 
+std::string SQS::get_queue_name(std::string& qurl) {
+  auto pos = qurl.find_last_of('/');
+  return qurl.substr(pos + 1);
+}
+
 std::unique_ptr<std::vector<std::string>> SQS::get_queue_urls() {
   std::vector<std::string> urls;
 

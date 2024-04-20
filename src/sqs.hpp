@@ -45,6 +45,7 @@ class SQS {
   bool purge_queue(std::string qurl);
   std::vector<Message> receive(std::string qurl, int count);
   bool delete_message(DeleteMessageInput* input);
+  std::string get_queue_name(std::string& qurl);
 };
 }  // namespace sqscpp
 

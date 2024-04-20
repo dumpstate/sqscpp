@@ -166,6 +166,7 @@ struct CreateQueueResponse {
 
 struct QueueInfo {
   std::string queue_url;
+  std::string queue_name;
   int message_count;
 };
 

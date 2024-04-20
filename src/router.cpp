@@ -48,7 +48,7 @@ restinio::request_handling_status_t sqs_query_handler(
       std::vector<QueueInfo> queues;
       for (auto& qurl : *qurls) {
         auto count = sqs->get_message_count(qurl);
-        queues.push_back(QueueInfo{qurl, count});
+        queues.push_back(QueueInfo{qurl, sqs->get_queue_name(qurl), count});
       }
       auto res = ListQueuesResponse{&queues};
       return resp_ok(serde, req, serde->serialize(&res));
@@ -187,6 +187,11 @@ restinio::request_handling_status_t html_query_handler(
     restinio::request_handle_t req) {
   auto path = req->header().path();
   if (path == "/") {
+    return req->create_response(restinio::status_permanent_redirect())
+        .append_header(restinio::http_field::location, "/queues")
+        .set_body("")
+        .done();
+  } else if (path == "/queues") {
     headers->set_field(AWS_TARGET, "AmazonSQS.ListQueues");
   }
   return sqs_query_handler(sqs, serde, headers, req);

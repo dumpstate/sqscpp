@@ -307,7 +307,9 @@ std::string HtmlSerde::serialize(ListQueuesResponse* res) {
     ss << "<tbody>";
     for (const auto& info : *(res->queue_urls)) {
       ss << "<tr>";
-      ss << "<td>" << info.queue_url << "</td>";
+      ss << "<td>";
+      ss << "<a href=\"/queues/" << info.queue_name << "\">";
+      ss << info.queue_url << "</a></td>";
       ss << "<td>" << info.message_count << "</td>";
       ss << "</tr>";
     }

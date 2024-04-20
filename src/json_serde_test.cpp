@@ -96,7 +96,8 @@ TEST(json_serde_test, create_queue_response_to_str) {
 TEST(json_serde_test, list_queues_response_to_str) {
   JsonSerde serde;
   ListQueuesResponse res;
-  std::vector<QueueInfo> qs = {QueueInfo{"foo", 0}, QueueInfo{"bar", 1}};
+  std::vector<QueueInfo> qs = {QueueInfo{"foo", "foo", 0},
+                               QueueInfo{"bar", "bar", 1}};
   res.queue_urls = &qs;
   auto str = serde.serialize(&res);
 

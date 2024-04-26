@@ -1,6 +1,8 @@
 # sqscpp
 
-C++ implementation of AWS SQS.
+*Disclaimer* - it's a for fun project - primarily to dust-off C++ skills.
+
+C++ (partial) implementation of an in-memory AWS SQS.
 
 ## Local Development
 
